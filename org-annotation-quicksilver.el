@@ -1,4 +1,5 @@
 (require 'url)
+(require 'remember)
 
 (autoload 'url-unhex-string "url")
 
@@ -118,10 +119,17 @@ the plist created by the org-annotation-helpers."
   (if org-remember-templates
       (let* ((entry (org-select-remember-template use-char))
 	     (ct (or org-overriding-default-time (org-current-time)))
+	     (dct (decode-time ct))
+	     (ct1
+	      (if (< (nth 2 dct) org-extend-today-until)
+		  (encode-time 0 59 23 (1- (nth 3 dct)) (nth 4 dct) (nth 5 dct))
+		ct))
 	     (tpl (car entry))
 	     (plist-p (if org-store-link-plist t nil))
-	     (file (if (and (nth 1 entry) (stringp (nth 1 entry))
-			    (string-match "\\S-" (nth 1 entry)))
+	     (file (if (and (nth 1 entry) 
+			    (or (and (stringp (nth 1 entry))
+				     (string-match "\\S-" (nth 1 entry)))
+				(functionp (nth 1 entry))))
 		       (nth 1 entry)
 		     org-default-notes-file))
 	     (headline (nth 2 entry))
@@ -149,8 +157,12 @@ the plist created by the org-annotation-helpers."
 		    v-a))
 	     (v-n user-full-name)
 	     (org-startup-folded nil)
+	     (org-inhibit-startup t)
 	     org-time-was-given org-end-time-was-given x
 	     prompt completions char time pos default histvar)
+
+	(when (functionp file)
+	  (setq file (funcall file)))
 	(when (and file (not (file-name-absolute-p file)))
 	  (setq file (expand-file-name file org-directory)))
 	;; 	(setq org-store-link-plist
@@ -162,13 +174,14 @@ the plist created by the org-annotation-helpers."
 	    (setq v-a (plist-get org-store-link-plist :annotation)))
 	(insert (substitute-command-keys
 		 (format
-		  "## Filing location: Select interactively, default, or last used:
+"## Filing location: Select interactively, default, or last used:
 ## %s  to select file and header location interactively.
 ## %s  \"%s\" -> \"* %s\"
-## C-u C-u C-c C-c  \"%s\" -> \"* %s\"
+## C-0 C-c C-c  \"%s\" -> \"* %s\"
+## C-u C-c C-c  like C-c C-c, and immediately visit note at target location
 ## To switch templates, use `\\[org-remember]'.  To abort use `C-c C-k'.\n\n"
-		  (if org-remember-store-without-prompt "    C-u C-c C-c" "        C-c C-c")
-		  (if org-remember-store-without-prompt "        C-c C-c" "    C-u C-c C-c")
+		  (if org-remember-store-without-prompt "C-1 C-c C-c" "        C-c C-c")
+		  (if org-remember-store-without-prompt "    C-c C-c" "    C-1 C-c C-c")
 		  (abbreviate-file-name (or file org-default-notes-file))
 		  (or headline "")
 		  (or (car org-remember-previous-location) "???")
@@ -221,7 +234,7 @@ the plist created by the org-annotation-helpers."
 		 (replace-match x t t))))
 
 	;; Turn on org-mode in the remember buffer, set local variables
-	(org-mode)
+	(let ((org-inhibit-startup t)) (org-mode))
 	(org-set-local 'org-finish-function 'org-remember-finalize)
 	(if (and file (string-match "\\S-" file) (not (file-directory-p file)))
 	    (org-set-local 'org-default-notes-file file))
@@ -229,7 +242,7 @@ the plist created by the org-annotation-helpers."
 	    (org-set-local 'org-remember-default-headline headline))
 	;; Interactive template entries
 	(goto-char (point-min))
-	(while (re-search-forward "%^\\({\\([^}]*\\)}\\)?\\([gGtTuUCL]\\)?" nil t)
+	(while (re-search-forward "%^\\({\\([^}]*\\)}\\)?\\([gGtTuUCLp]\\)?" nil t)
 	  (setq char (if (match-end 3) (match-string 3))
 		prompt (if (match-end 2) (match-string 2)))
 	  (goto-char (match-beginning 0))
@@ -254,8 +267,8 @@ the plist created by the org-annotation-helpers."
 			 'org-tags-completion-function nil nil nil
 			 'org-tags-history)))
 	      (setq ins (mapconcat 'identity
-				   (org-split-string ins (org-re "[^[:alnum:]_@]+"))
-				   ":"))
+				  (org-split-string ins (org-re "[^[:alnum:]_@]+"))
+				  ":"))
 	      (when (string-match "\\S-" ins)
 		(or (equal (char-before) ?:) (insert ":"))
 		(insert ins)
@@ -268,13 +281,28 @@ the plist created by the org-annotation-helpers."
 					(car clipboards))))))
 	   ((equal char "L")
 	    (cond ((= (length clipboards) 1)
-		   (org-insert-l
-		    ink 0 (car clipboards)))
+		   (org-insert-link 0 (car clipboards)))
 		  ((> (length clipboards) 1)
 		   (org-insert-link 0 (read-string "Clipboard/kill value: "
 						   (car clipboards)
 						   '(clipboards . 1)
 						   (car clipboards))))))
+	   ((equal char "p")
+	    (let*
+		((prop (substring-no-properties prompt))
+		 (allowed (with-current-buffer
+			      (get-buffer (file-name-nondirectory file))
+			    (org-property-get-allowed-values nil prop 'table)))
+		 (existing (with-current-buffer
+			       (get-buffer (file-name-nondirectory file))
+			     (mapcar 'list (org-property-values prop))))
+		 (propprompt (concat "Value for " prop ": "))
+		 (val (if allowed
+			  (org-completing-read propprompt allowed nil
+					       'req-match)
+			(org-completing-read propprompt existing nil nil
+					     "" nil ""))))
+	      (org-set-property prop val)))
 	   (char
 	    ;; These are the date/time related ones
 	    (setq org-time-was-given (equal (upcase char) char))
@@ -293,7 +321,7 @@ the plist created by the org-annotation-helpers."
 	(if (re-search-forward "%\\?" nil t)
 	    (replace-match "")
 	  (and (re-search-forward "^[^#\n]" nil t) (backward-char 1))))
-    (org-mode)
+    (let ((org-inhibit-startup t)) (org-mode))
     (org-set-local 'org-finish-function 'org-remember-finalize))
   (when (save-excursion
 	  (goto-char (point-min))
@@ -324,6 +352,7 @@ initial region to remember and to call
 org-remember-apply-template-qs (rather than
 org-remember-apply-template) if necessary."
   (interactive "P")
+  (org-require-remember)
   (cond
    ((equal goto '(4)) (org-go-to-remember-target))
    ((equal goto '(16)) (org-remember-goto-last-stored))
