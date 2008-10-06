@@ -111,11 +111,13 @@ annotation://   squirrel away a link of the form [[url][title]] that can
   "Initialize *remember* buffer with template, invoke `org-mode'.
 This function should be placed into `remember-mode-hook' and in fact requires
 to be run from that hook to function properly.
-
 Differs from original org-remember-apply-template in that doesn't
 change org-store-link-plist :annotation and :initial to
 remember's values and extracts values for these properties from
 the plist created by the org-annotation-helpers."
+  (when (and (boundp 'initial) (stringp initial))
+    (setq initial (org-no-properties initial))
+    (remove-text-properties 0 (length initial) '(read-only t) initial))
   (if org-remember-templates
       (let* ((entry (org-select-remember-template use-char))
 	     (ct (or org-overriding-default-time (org-current-time)))
@@ -156,6 +158,13 @@ the plist created by the org-annotation-helpers."
 		      (replace-match "[\\1[%^{Link description}]]" nil nil v-a)
 		    v-a))
 	     (v-n user-full-name)
+	     (v-k (if (marker-buffer org-clock-marker)
+		      (substring-no-properties org-clock-heading)))
+	     (v-K (if (marker-buffer org-clock-marker)
+		      (org-make-link-string
+		       (buffer-file-name (marker-buffer org-clock-marker))
+		       org-clock-heading)))
+	     v-I
 	     (org-startup-folded nil)
 	     (org-inhibit-startup t)
 	     org-time-was-given org-end-time-was-given x
@@ -174,21 +183,24 @@ the plist created by the org-annotation-helpers."
 	    (setq v-a (plist-get org-store-link-plist :annotation)))
 	(insert (substitute-command-keys
 		 (format
-"## Filing location: Select interactively, default, or last used:
-## %s  to select file and header location interactively.
-## %s  \"%s\" -> \"* %s\"
-## C-0 C-c C-c  \"%s\" -> \"* %s\"
+"## %s  \"%s\" -> \"* %s\"
 ## C-u C-c C-c  like C-c C-c, and immediately visit note at target location
+## C-0 C-c C-c  \"%s\" -> \"* %s\"
+## %s  to select file and header location interactively.
+## C-2 C-c C-c  as child of the currently clocked item
 ## To switch templates, use `\\[org-remember]'.  To abort use `C-c C-k'.\n\n"
 		  (if org-remember-store-without-prompt "C-1 C-c C-c" "        C-c C-c")
 		  (if org-remember-store-without-prompt "    C-c C-c" "    C-1 C-c C-c")
 		  (abbreviate-file-name (or file org-default-notes-file))
 		  (or headline "")
 		  (or (car org-remember-previous-location) "???")
-		  (or (cdr org-remember-previous-location) "???"))))
-	(insert tpl) (goto-char (point-min))
+		  (or (cdr org-remember-previous-location) "???")
+		  (if org-remember-store-without-prompt "C-1 C-c C-c" "        C-c C-c"))))
+	(insert tpl)
+	(goto-char (point-min))
+
 	;; Simple %-escapes
-	(while (re-search-forward "%\\([tTuUaiAcx]\\)" nil t)
+	(while (re-search-forward "%\\([tTuUaiAcxkKI]\\)" nil t)
 	  (when (and initial (equal (match-string 0) "%i"))
 	    (save-match-data
 	      (let* ((lead (buffer-substring
