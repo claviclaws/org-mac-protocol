@@ -1,3 +1,58 @@
+;;; org-annotation-quicksilver --- OS X only. Allows creation of org
+;;; notes from other applications via Quicksilver and remember-mode.
+;;
+;; Author: suckling AT gmail DOT com
+;;
+;; Version: 0.608
+;;
+;;; Commentary
+;; 
+;; 
+;; Opens a *remember* buffer from any AppleScript enabled application,
+;; linking to the open document and, were possible, setting the initial
+;; content of the *remember* buffer to the document's selected
+;; text. Features dynamic selection of remember templates from
+;; Quicksilver and transparant creation of org notes without switching
+;; focus from the source application.
+;;
+;; This file is an extended verison of org-annotation-helper.el by
+;; [bzg] and [dmg]. It incorporates slightly modified functions from
+;; org-remember.el by Carsten Dominik.
+;;
+;;; Requirements
+;;
+;; OS X 10.5 (untested on previous versions, but should work) 
+;;
+;; org-mode
+;; remember-mode 
+;;
+;; org-annotation-quicksilver helper AppleScripts (included in 
+;; this archive): 
+;; org-link.scpt 
+;; org-note.scpt
+;; org-remember.scpt 
+;; Optional: org-mairix-display.scpt (if this package is not already
+;; obscure enough, if you also happen to use mutt in a Termial.app
+;; window and use mairix to index your maildir folders, then this
+;; may be useful) 
+;;
+;; Quicksilver (http://code.google
+;; Optional: Growl (http://
+;;
+;;; Installation
+;;
+;; Copy this file to your load path and byte compile.
+;;
+;; Add 
+;;
+;; (require 'org-annotation-quicksilver) 
+;;
+;; to your .emacs.
+;;
+;; Please see org-annotation-quicksilver.org for full installation
+;; instructions for the helper AppleScripts and *remember* buffer
+;; templates.
+
 (require 'url)
 (require 'remember)
 
@@ -5,6 +60,8 @@
 
 (defun org-annotation-helper-remember (theLink &optional theText theTemplate noAnnotation)
   "Process an externally passed remember:// style url.
+
+This function will initialise a *remember* buffer for further annotation, passing a link and the selection as initial content for the buffer.
 
 URLSTRING consists of a protocol part and a url and title,
 separated by ::remember::
@@ -57,6 +114,10 @@ annotation://   squirrel away a link of the form [[url][title]] that can
 
 (defun org-annotation-helper-file (theLink &optional theText theTemplate noAnnotation)
   "Process an externally passed remember:// style url.
+
+This function will initalise then file a *remember* buffer
+containing the link, selected content and supplied text without
+any further prompting.
 
 URLSTRING consists of a protocol part and a url and title,
 separated by ::remember::
@@ -111,10 +172,11 @@ annotation://   squirrel away a link of the form [[url][title]] that can
   "Initialize *remember* buffer with template, invoke `org-mode'.
 This function should be placed into `remember-mode-hook' and in fact requires
 to be run from that hook to function properly.
-Differs from original org-remember-apply-template in that doesn't
-change org-store-link-plist :annotation and :initial to
-remember's values and extracts values for these properties from
-the plist created by the org-annotation-helpers."
+
+Differs from org-mode's org-remember-apply-template in that it
+doesn't override org-store-link-plist :annotation and :initial with
+remember-mode's values. It extracts values for these properties from
+the plist created by the org-annotation-helper- functions."
   (when (and (boundp 'initial) (stringp initial))
     (setq initial (org-no-properties initial))
     (remove-text-properties 0 (length initial) '(read-only t) initial))
@@ -359,10 +421,9 @@ note stored by remember.
 Lisp programs can set ORG-FORCE-REMEMBER-TEMPLATE-CHAR to a character
 associated with a template in `org-remember-templates'.
 
-The only difference from the original org-remember is to pass the
-initial region to remember and to call
-org-remember-apply-template-qs (rather than
-org-remember-apply-template) if necessary."
+Differs from org-mode's org-remember by passing the initial
+region to remember and calling org-remember-apply-template-qs if
+necessary."
   (interactive "P")
   (org-require-remember)
   (cond
