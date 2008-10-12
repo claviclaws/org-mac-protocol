@@ -1,3 +1,59 @@
+(*
+org-mairix-display --- OS X 10.5 only. Handles links passed by org-mairix.el
+
+Author: Christopher Suckling: suckling AT gmail DOT com
+
+Version: 0.609
+
+Commentary
+
+Looks for a Terminal.app window running a mutt process; if found, opens a new tab
+and launches a new mutt process displaying the mairix query.
+
+If no mutt process running, opens a new Terminal.app window and launchs a mutt process 
+displaying the mairix query.
+
+Requirements
+
+OS X 10.5
+mutt
+mairix
+org-mairix.el
+Optional: mutt.terminal (included in this archive)
+
+Installation
+
+1) Copy this script to directory of your choice.
+
+2) Either:
+
+Import mutt.terminal settings into Terminal.app
+(Terminal - Preferences - Settings - Import)
+
+Or:
+
+Edit all occurances of 
+
+set current settings of front window to settings set "mutt"
+set bounds of front window to {20, 10, 1160, 775}
+
+to your own tastes.
+
+3) Edit all occurances of
+
+~/Library/Maildir/mairix-search
+
+to the path to your mairix results maildir.
+
+4) Add the following to your .emacs:
+
+(setq org-mairix-open-command "mairix %args% %search%")
+(setq org-mairix-threaded-links t)
+(setq org-mairix-mutt-display-command "osascript /pathto/org-mairix-display.scpt %search%")
+(setq org-mairix-display-hook 'org-mairix-mutt-display-results)
+
+*)
+
 on run argv
 	tell application "System Events"
 		if not (exists process "Terminal") then

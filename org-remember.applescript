@@ -1,3 +1,58 @@
+(*
+org-remember.scpt --- make a note in an org-mode file, linking to the front
+document and any selected text
+
+Author: Christopher Suckling: suckling AT gmail DOT com
+
+Version: 0.609
+
+Commentary
+
+Part of org-annotation-quicksilver
+
+Currently supported applications:
+
+Finder
+Safari
+Mail
+Skim
+BibDesk
+mutt (using mairix as an index and runinng in a Termail.app window)
+
+If you run the script on an unsupported, but AppleScript aware application, the script
+attempt to create a link to that document (but not selected content), but may not be
+successful. 
+
+Syntax
+
+Text processed by Quicksilver:
+
+[blank]
+
+Append link and selected content using *remember* template "QS Inbox"
+
+foobar
+
+Append note, link and selected content using *remember* template "QS Inbox"
+
+foobar::x
+
+Append note, link and selected content using *remember* template x
+
+::x
+
+Raise Emacs and initialize a *remember* buffer containing link and selected content using
+*remember* template x
+
+Installation
+
+1) Copy to ~/Library/Application Support/Quicksilver/Actions/
+
+2) Restart Quicksilver
+
+Please see org-annotation-quicksilver.org for full installation and usage instructions
+*)
+
 using terms from application "Quicksilver"
 	on process text theText
 		

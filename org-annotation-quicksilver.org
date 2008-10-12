@@ -1,0 +1,18 @@
+* org-annotation-quicksilver
+
+** Version: 0.609
+
+** Included files:
+
+   - org-annotation-quicksilver.org (this file)
+   - org-annotation-quicksilver.el
+   - org-remember.scpt
+   - org-note.scpt
+   - org-link.scpt
+   - org-mairix-display.scpt
+   - org-mairix-link.sh
+   - mutt.terminal
+
+*** Default template
+
+q

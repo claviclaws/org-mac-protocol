@@ -1,12 +1,11 @@
 ;;; org-annotation-quicksilver --- OS X only. Allows creation of org
 ;;; notes from other applications via Quicksilver and remember-mode.
 ;;
-;; Author: suckling AT gmail DOT com
+;; Author: Christopher Suckling: suckling AT gmail DOT com
 ;;
-;; Version: 0.608
+;; Version: 0.609
 ;;
 ;;; Commentary
-;; 
 ;; 
 ;; Opens a *remember* buffer from any AppleScript enabled application,
 ;; linking to the open document and, were possible, setting the initial
@@ -31,13 +30,13 @@
 ;; org-link.scpt 
 ;; org-note.scpt
 ;; org-remember.scpt 
-;; Optional: org-mairix-display.scpt (if this package is not already
-;; obscure enough, if you also happen to use mutt in a Termial.app
-;; window and use mairix to index your maildir folders, then this
-;; may be useful) 
+;; Optional: org-mairix-display.scpt and org-mairix-link.sh (if this 
+;; package is not already obscure enough, if you also happen to use
+;; mutt in a Termial.app window and use mairix to index your maildir
+;; folders, then this may be useful)
 ;;
-;; Quicksilver (http://code.google
-;; Optional: Growl (http://
+;; Quicksilver (http://code.google.com/p/blacktree-alchemy/) Optional:
+;; Growl (http://growl.info)
 ;;
 ;;; Installation
 ;;

@@ -1,3 +1,39 @@
+(*
+org-note.scpt --- make a note in an org-mode file without linking to front document
+
+Author: Christopher Suckling: suckling AT gmail DOT com
+
+Version: 0.609
+
+Commentary
+
+Part of org-annotation-quicksilver
+
+Syntax
+
+Text processed by Quicksilver:
+
+foobar
+
+Append a note using *remember* template "QS Inbox"
+
+foobar::x
+
+Append a note using *remember* template x
+
+foobar::
+
+Raise Emacs and initialize an empty *remember* buffer
+
+Installation
+
+1) Copy to ~/Library/Application Support/Quicksilver/Actions/
+
+2) Restart Quicksilver
+
+Please see org-annotation-quicksilver.org for full installation and usage instructions
+*)
+
 using terms from application "Quicksilver"
 	on process text theText
 		
