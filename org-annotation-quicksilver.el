@@ -35,8 +35,7 @@
 ;; mutt in a Termial.app window and use mairix to index your maildir
 ;; folders, then this may be useful)
 ;;
-;; Quicksilver (http://code.google.com/p/blacktree-alchemy/) Optional:
-;; Growl (http://growl.info)
+;; Quicksilver (http://code.google.com/p/blacktree-alchemy/) 
 ;;
 ;;; Installation
 ;;

@@ -41,8 +41,8 @@ Append note, link and selected content using *remember* template x
 
 ::x
 
-Raise Emacs and initialize a *remember* buffer containing link and selected content using
-*remember* template x
+Raise Emacs and initialize a *remember* buffer containing link and
+selected content using *remember* template x
 
 Installation
 
