@@ -3,7 +3,7 @@
 #+AUTHOR: Christopher Suckling
 #+EMAIL: suckling AT gmail DOT com
 #+OPTIONS: num:nil
-#+INFOJS_OPT: path:/Users/christopher/Desktop/org-info.js view:info
+#+INFOJS_OPT: path:org-info.js view:info
 
   Version: 0.609
 
@@ -13,17 +13,17 @@
 
 ** Included files
 
-   - [[file:./org-annotation-quicksilver.org][org-annotation-quicksilver.org]] (this file)
-   - [[file:./org-annotation-quicksilver.el][org-annotation-quicksilver.el]]
-   - [[file:org-remember.scpt][org-remember.scpt]]
-   - [[file:./org-note.scpt][org-note.scpt]]
-   - [[file:./org-link.scpt][org-link.scpt]]
+   - org-annotation-quicksilver.org (source for this manual)
+   - org-annotation-quicksilver.el
+   - org-remember.scpt
+   - org-note.scpt
+   - org-link.scpt
 
      /Optional/ (provides org-mairix integration)
 
-   - [[file:./org-mairix-display.scpt][org-mairix-display.scpt]]
-   - [[file:./org-mairix-link.sh][org-mairix-link.sh]]
-   - [[file:./mutt.terminal][mutt.terminal]]
+   - org-mairix-display.scpt
+   - org-mairix-link.sh
+   - mutt.terminal
 
 ** Requirements
 
@@ -38,33 +38,33 @@
    An archive can be downloaded [[http://claviclaws.net/org/oaq.zip][here]].
 ** Installation
 *** Install files
-**** [[file:./org-annotation-quicksilver.el][org-annotation-quicksilver.el]]
+**** org-annotation-quicksilver.el
 
     - Copy this file to your Emacs load-path and byte-compile
 
-**** [[file:org-remember.scpt][org-remember.scpt]]
+**** org-remember.scpt
 
      - Copy to ~/Library/Application Support/Quicksilver/Actions/
 
-**** [[file:./org-note.scpt][org-note.scpt]]
+**** org-note.scpt
 
      - Copy to ~/Library/Application Support/Quicksilver/Actions/
 
-**** [[file:./org-link.scpt][org-link.scpt]]
+**** org-link.scpt
 
      - Copy to ~/Library/Application Support/Quicksilver/Actions/
 
 
 *** /Optional/ install org-mairix files 
-**** [[file:org-mairix-display.scpt][org-mairix-display.scpt]]
+**** org-mairix-display.scpt
 
      - Copy file to your mutt configuration directory
 
-**** [[file:org-mairix-link.sh][org-mairix-link.sh]]
+**** org-mairix-link.sh
 
      - Copy file to your mutt configuration directory
 
-**** [[file:./mutt.terminal][mutt.terminal]]
+**** mutt.terminal
     
      - Import the file into Terminal.app
 
