@@ -188,7 +188,7 @@ the plist created by the org-annotation-helper- functions."
 		ct))
 	     (tpl (car entry))
 	     (plist-p (if org-store-link-plist t nil))
-	     (file (if (and (nth 1 entry) 
+	     (file (if (and (nth 1 entry)
 			    (or (and (stringp (nth 1 entry))
 				     (string-match "\\S-" (nth 1 entry)))
 				(functionp (nth 1 entry))))
@@ -219,7 +219,7 @@ the plist created by the org-annotation-helper- functions."
 		    v-a))
 	     (v-n user-full-name)
 	     (v-k (if (marker-buffer org-clock-marker)
-		      (substring-no-properties org-clock-heading)))
+		      (org-substring-no-properties org-clock-heading)))
 	     (v-K (if (marker-buffer org-clock-marker)
 		      (org-make-link-string
 		       (buffer-file-name (marker-buffer org-clock-marker))
@@ -249,7 +249,6 @@ the plist created by the org-annotation-helper- functions."
 ## %s  to select file and header location interactively.
 ## C-2 C-c C-c  as child of the currently clocked item
 ## To switch templates, use `\\[org-remember]'.  To abort use `C-c C-k'.\n\n"
-		  (if org-remember-store-without-prompt "C-1 C-c C-c" "        C-c C-c")
 		  (if org-remember-store-without-prompt "    C-c C-c" "    C-1 C-c C-c")
 		  (abbreviate-file-name (or file org-default-notes-file))
 		  (or headline "")
@@ -306,8 +305,7 @@ the plist created by the org-annotation-helper- functions."
 		 (replace-match x t t))))
 
 	;; Turn on org-mode in the remember buffer, set local variables
-	(let ((org-inhibit-startup t)) (org-mode))
-	(org-set-local 'org-finish-function 'org-remember-finalize)
+	(let ((org-inhibit-startup t)) (org-mode) (org-remember-mode 1))
 	(if (and file (string-match "\\S-" file) (not (file-directory-p file)))
 	    (org-set-local 'org-default-notes-file file))
 	(if headline
@@ -334,7 +332,7 @@ the plist created by the org-annotation-helper- functions."
 		    (org-global-tags-completion-table
 		     (if (equal char "G") (org-agenda-files) (and file (list file)))))
 		   (org-add-colon-after-tag-completion t)
-		   (ins (completing-read
+		   (ins (org-ido-completing-read
 			 (if prompt (concat prompt ": ") "Tags: ")
 			 'org-tags-completion-function nil nil nil
 			 'org-tags-history)))
@@ -361,18 +359,24 @@ the plist created by the org-annotation-helper- functions."
 						   (car clipboards))))))
 	   ((equal char "p")
 	    (let*
-		((prop (substring-no-properties prompt))
-		 (allowed (with-current-buffer
-			      (get-buffer (file-name-nondirectory file))
-			    (org-property-get-allowed-values nil prop 'table)))
+		((prop (org-substring-no-properties prompt))
+		 (pall (concat prop "_ALL"))
+		 (allowed
+		  (with-current-buffer
+		      (get-buffer (file-name-nondirectory file))
+		    (or (cdr (assoc pall org-file-properties))
+			(cdr (assoc pall org-global-properties))
+			(cdr (assoc pall org-global-properties-fixed)))))
 		 (existing (with-current-buffer
 			       (get-buffer (file-name-nondirectory file))
 			     (mapcar 'list (org-property-values prop))))
 		 (propprompt (concat "Value for " prop ": "))
 		 (val (if allowed
-			  (org-completing-read propprompt allowed nil
-					       'req-match)
-			(org-completing-read propprompt existing nil nil
+			  (org-completing-read
+			   propprompt
+			   (mapcar 'list (org-split-string allowed "[ \t]+"))
+			   nil 'req-match)
+			(org-completing-read-no-ido propprompt existing nil nil
 					     "" nil ""))))
 	      (org-set-property prop val)))
 	   (char
@@ -384,17 +388,17 @@ the plist created by the org-annotation-helper- functions."
 				   (member char '("u" "U"))
 				   nil nil (list org-end-time-was-given)))
 	   (t
-	    (insert (org-completing-read
-		     (concat (if prompt prompt "Enter string")
-			     (if default (concat " [" default "]"))
-			     ": ")
-		     completions nil nil nil histvar default)))))
+	    (let (org-completion-use-ido)
+	      (insert (org-completing-read-no-ido
+		       (concat (if prompt prompt "Enter string")
+			       (if default (concat " [" default "]"))
+			       ": ")
+		       completions nil nil nil histvar default))))))
 	(goto-char (point-min))
 	(if (re-search-forward "%\\?" nil t)
 	    (replace-match "")
 	  (and (re-search-forward "^[^#\n]" nil t) (backward-char 1))))
-    (let ((org-inhibit-startup t)) (org-mode))
-    (org-set-local 'org-finish-function 'org-remember-finalize))
+    (let ((org-inhibit-startup t)) (org-mode) (org-remember-mode 1)))
   (when (save-excursion
 	  (goto-char (point-min))
 	  (re-search-forward "%&" nil t))
@@ -432,7 +436,7 @@ necessary."
     ;; `org-select-remember-template'
     (setq org-select-template-temp-major-mode major-mode)
     (setq org-select-template-original-buffer (current-buffer))
-    (if (eq org-finish-function 'org-remember-finalize)
+    (if org-remember-mode
 	(progn
 	  (when (< (length org-remember-templates) 2)
 	    (error "No other template available"))

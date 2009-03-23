@@ -49,7 +49,7 @@ using terms from application "Quicksilver"
 				if (count text items in theText) = 2 then
 					set theTemplate to last text item in theText
 					set theText to first text item in theText
-					if theText is "" then
+					if theTemplate is "" then
 						set theFunction to "org-annotation-helper-remember"
 						set raiseEmacs to true
 					else
