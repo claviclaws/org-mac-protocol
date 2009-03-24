@@ -1,9 +1,9 @@
 (*
 org-note.scpt --- make a note in an org-mode file without linking to front document
 
-Author: Christopher Suckling: suckling AT gmail DOT com
+Author: Christopher Suckling <suckling AT gmail DOT com>
 
-Version: 0.609
+Version: 0.624
 
 Commentary
 
@@ -33,6 +33,9 @@ Installation
 
 Please see org-annotation-quicksilver.org for full installation and usage instructions
 *)
+
+property orgQSLib : ((path to home folder as text) & "Library:Application Support:Quicksilver:Actions:orgQSLib:")
+property getEmacsLib : load script ((orgQSLib as text) & "getEmacsClient.scpt") as alias
 
 using terms from application "Quicksilver"
 	on process text theText
@@ -65,7 +68,7 @@ using terms from application "Quicksilver"
 		set theLink to "remember://http://dummy::remember::dummy::remember::"
 		set noAnnotation to true
 		
-		set theScript to "/Applications/Emacs.app/Contents/MacOS/bin/emacsclient -e \"(progn (" & theFunction & " \\\"" & theLink & "\\\" \\\"" & theText & "\\\" \\\"" & theTemplate & "\\\" \\\"" & noAnnotation & "\\\") nil)\""
+		set theScript to getEmacsLib's getEmacsClient() & " -e \"(progn (" & theFunction & " \\\"" & theLink & "\\\" \\\"" & theText & "\\\" \\\"" & theTemplate & "\\\" \\\"" & noAnnotation & "\\\") nil)\""
 		
 		do shell script theScript
 		
