@@ -3,7 +3,7 @@
 ;;
 ;; Author: Christopher Suckling: suckling AT gmail DOT com
 ;;
-;; Version: 0.609
+;; Version: 0.624
 ;;
 ;;; Commentary
 ;; 
@@ -404,6 +404,15 @@ the plist created by the org-annotation-helper- functions."
 	  (re-search-forward "%&" nil t))
     (replace-match "")
     (org-set-local 'org-jump-to-target-location t))
+  (when org-remember-backup-directory
+    (unless (file-directory-p org-remember-backup-directory)
+      (make-directory org-remember-backup-directory))
+    (setq buffer-file-name
+	  (expand-file-name
+	   (format-time-string "remember-%Y-%m-%d-%H-%M-%S")
+	   org-remember-backup-directory))
+    (save-buffer)
+    (setq auto-save-visited-file-name t))
   (when (save-excursion
 	  (goto-char (point-min))
 	  (re-search-forward "%!" nil t))
