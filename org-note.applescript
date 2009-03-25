@@ -36,6 +36,8 @@ Please see org-annotation-quicksilver.org for full installation and usage instru
 
 property orgQSLib : ((path to home folder as text) & "Library:Application Support:Quicksilver:Actions:orgQSLib:")
 property getEmacsLib : load script ((orgQSLib as text) & "getEmacsClient.scpt") as alias
+property getItemMetaLib : load script ((orgQSLib as text) & "getItemMetadata.scpt") as alias
+property theProtocol : "remember://"
 
 using terms from application "Quicksilver"
 	on process text theText
@@ -45,7 +47,7 @@ using terms from application "Quicksilver"
 			return 0
 		else
 			if (count text items in theText) = 1 then
-				set theFunction to "org-annotation-helper-file"
+				set rememberFile to "file"
 				set raiseEmacs to false
 				set theTemplate to "q"
 			else
@@ -53,10 +55,10 @@ using terms from application "Quicksilver"
 					set theTemplate to last text item in theText
 					set theText to first text item in theText
 					if theTemplate is "" then
-						set theFunction to "org-annotation-helper-remember"
+						set rememberFile to "remember"
 						set raiseEmacs to true
 					else
-						set theFunction to "org-annotation-helper-file"
+						set rememberFile to "file"
 						set raiseEmacs to false
 					end if
 				end if
@@ -64,11 +66,12 @@ using terms from application "Quicksilver"
 		end if
 		set AppleScript's text item delimiters to ""
 		
-		
 		set theLink to "remember://http://dummy::remember::dummy::remember::"
+		
 		set noAnnotation to true
 		
-		set theScript to getEmacsLib's getEmacsClient() & " -e \"(progn (" & theFunction & " \\\"" & theLink & "\\\" \\\"" & theText & "\\\" \\\"" & theTemplate & "\\\" \\\"" & noAnnotation & "\\\") nil)\""
+		set theScript to getEmacsLib's getEmacsClient() & " -e \"(progn (org-annotation-helper-remember \\\"" & theLink & "\\\" \\\"" & theText & "\\\" \\\"" & theTemplate & "\\\" \\\"" & noAnnotation & "\\\" \\\"" & rememberFile & "\\\") nil)\""
+		
 		
 		do shell script theScript
 		

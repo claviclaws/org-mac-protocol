@@ -64,11 +64,11 @@ using terms from application "Quicksilver"
 		set AppleScript's text item delimiters to "::"
 		if (count text items in theText) = 0 then
 			set theTemplate to "q"
-			set theFunction to "org-annotation-helper-file"
+			set rememberFile to "file"
 			set raiseEmacs to false
 		else
 			if (count text items in theText) = 1 then
-				set theFunction to "org-annotation-helper-file"
+				set rememberFile to "file"
 				set raiseEmacs to false
 				set theTemplate to "q"
 			else
@@ -76,10 +76,10 @@ using terms from application "Quicksilver"
 					set theTemplate to last text item in theText
 					set theText to first text item in theText
 					if theText is "" then
-						set theFunction to "org-annotation-helper-remember"
+						set rememberFile to "remember"
 						set raiseEmacs to true
 					else
-						set theFunction to "org-annotation-helper-file"
+						set rememberFile to "file"
 						set raiseEmacs to false
 					end if
 				end if
@@ -94,7 +94,7 @@ using terms from application "Quicksilver"
 		
 		set noAnnotation to false
 		
-		set theScript to getEmacsLib's getEmacsClient() & " -e \"(progn (" & theFunction & " \\\"" & getItemMetaLib's getItemMetadata(theProtocol, theApp) & "\\\" \\\"" & theText & "\\\" \\\"" & theTemplate & "\\\" \\\"" & noAnnotation & "\\\") nil)\""
+		set theScript to getEmacsLib's getEmacsClient() & " -e \"(progn (org-annotation-helper-remember \\\"" & getItemMetaLib's getItemMetadata(theProtocol, theApp) & "\\\" \\\"" & theText & "\\\" \\\"" & theTemplate & "\\\" \\\"" & noAnnotation & "\\\" \\\"" & rememberFile & "\\\") nil)\""
 		
 		do shell script theScript
 		

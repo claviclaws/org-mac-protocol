@@ -57,10 +57,14 @@
 (autoload 'url-unhex-string "url")
 
 (defun org-qs-remember-annotation ()
-  (plist-put org-store-link-plist :annotation orglink)
-  (plist-get org-store-link-plist :annotation))
+  (if (string= noAnnotation "true")
+      (progn
+	(plist-put org-store-link-plist :annotation "")
+	(plist-get org-store-link-plist :annotation))
+    (plist-put org-store-link-plist :annotation orglink)
+    (plist-get org-store-link-plist :annotation)))
 
-(defun org-annotation-helper-remember (theLink &optional theText theTemplate noAnnotation)
+(defun org-annotation-helper-remember (theLink &optional theText theTemplate noAnnotation remember-or-file)
   "Process an externally passed remember:// style url.
 
 This function will initialise a *remember* buffer for further annotation, passing a link and the selection as initial content for the buffer.
@@ -86,19 +90,29 @@ annotation://   squirrel away a link of the form [[url][title]] that can
 			 (match-string 1 url)))
 	       (title (cadr splitparts))
 	       (region (url-unhex-string (caddr splitparts)))
+	       (regtext (concat region "\n\n" theText))
 	       orglink)
 	  (setq title (if (> (length title) 0) (url-unhex-string title)))
 	  (setq orglink (org-make-link-string url title))
-	  (org-store-link-props :annotation orglink			      
-				:initial region
-				:type type
-				:link url
-				:region region
-				:description title)
+	  (if (string= remember-or-file "remember")
+	      (org-store-link-props :annotation orglink			      
+				    :initial region
+				    :type type
+				    :link url
+				    :region region
+				    :description title)
+	    (org-store-link-props :annotation orglink
+				  :initial regtext
+				  :type type
+				  :link url
+				  :region regtext
+				  :description title))
 	  (if (string= noAnnotation "true")
-	      (progn
-		(plist-put org-store-link-plist :annotation "")
-		(plist-put org-store-link-plist :initial nil)))
+	      (if (string= remember-or-file "remember")
+		  (progn
+		    (plist-put org-store-link-plist :annotation "")
+		    (plist-put org-store-link-plist :initial nil))
+		(plist-put org-store-link-plist :annotation "")))
 	  (setq org-stored-links
 		(cons (list url title) org-stored-links))
 	  ;; Inelegant access of %a and %i in templates: requires
@@ -106,68 +120,15 @@ annotation://   squirrel away a link of the form [[url][title]] that can
 	  (raise-frame)
 	  (cond ((equal proto "remember")
 		 (let* ((remember-mode-hook 'org-remember-apply-template))
-		   (org-remember-qs nil theTemplate)))
+		   (org-remember-qs nil theTemplate))
+		 (if (string= remember-or-file "file")
+		     (org-remember-finalize)))
 		((equal proto "annotation")
 		 (message "Copied '%s' to the kill-ring." orglink)
 		 (kill-new orglink))
 		(t (error "unrecognized org-helper protocol"))))
       (error "could not parse argument"))))
 
-
-(defun org-annotation-helper-file (theLink &optional theText theTemplate noAnnotation)
-  "Process an externally passed remember:// style url.
-
-This function will initalise then file a *remember* buffer
-containing the link, selected content and supplied text without
-any further prompting.
-
-URLSTRING consists of a protocol part and a url and title,
-separated by ::remember::
-
-The protocol types currently recognized are:
-
-remember://     start `remember' with the url, title and selection (if any).
-annotation://   squirrel away a link of the form [[url][title]] that can
-                be used later with \\[org-insert-link]."
-  (interactive)
-  (let ((remember-annotation-functions '(org-qs-remember-annotation)))
-    ;; The `parse-url' functions break on the embedded url,
-    ;; since our format is fixed we'll split the url ourselves.
-    (if (string-match  "^\\([^:]*\\):\\(/*\\)\\(.*\\)" theLink)
-	(let* ((protocol (match-string 1 theLink))
-	       (url_title_region (match-string 3 theLink))
-	       (splitparts (split-string url_title_region "::remember::"))
-	       (url (url-unhex-string (car splitparts)))
-	       (type (if (string-match "^\\([a-z]+\\):" url) 
-			 (match-string 1 url)))
-	       (title (cadr splitparts))
-	       (region (url-unhex-string (caddr splitparts)))
-	       (regtext (concat region "\n\n" theText))
-	       orglink)
-	  (setq title (if (> (length title) 0) (url-unhex-string title)))
-	  (setq orglink (org-make-link-string url title))
-	  (org-store-link-props :annotation orglink
-				:initial regtext
-				:type type
-				:link url
-				:region regtext
-				:description title)
-	  (if (string= noAnnotation "true")
-	      (plist-put org-store-link-plist :annotation ""))	  
-	  (setq org-stored-links
-		(cons (list url title) org-stored-links))
-	  ;; Inelegant access of %a and %i in templates: requires
-	  ;; duplication of two org-remember functions
-	  (raise-frame)
-	  (cond ((equal protocol "remember")
-		 (let* ((remember-mode-hook 'org-remember-apply-template))
-		   (org-remember-qs nil theTemplate))
-		 (org-ctrl-c-ctrl-c))
-		((equal protocol "annotation")
-		 (message "Copied '%s' to the kill-ring." orglink)
-		 (kill-new orglink))
-		(t (error "unrecognized org-helper protocol"))))
-      (error "could not parse argument"))))
 
 (defun org-remember-qs (&optional goto org-force-remember-template-char)
   "Call `remember'.  If this is already a remember buffer, re-apply template.
