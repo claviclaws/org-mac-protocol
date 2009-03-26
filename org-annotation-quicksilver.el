@@ -56,6 +56,9 @@
 
 (autoload 'url-unhex-string "url")
 
+(add-to-list 'org-remember-templates
+	     '("QS Inbox" ?q "\n* QS %U%?\n%i\n%a" (concat org-directory "inbox.org") "Inbox") 'append)
+
 (defun org-qs-remember-annotation ()
   (if (string= noAnnotation "true")
       (progn
