@@ -14,7 +14,6 @@
 
 ** Included files
    
-   - org-annotation-quicksilver.html (this file)
    - org-annotation-quicksilver.org (source for this manual)
    - org-annotation-quicksilver.el
    - org-remember.scpt
