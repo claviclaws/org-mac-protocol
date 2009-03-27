@@ -178,8 +178,8 @@
 
        : foobar::x
 
-     - Raise Emacs and initialize a *remember* buffer containing link and
-       selected content using *remember* template x
+     - Raise Emacs and initialize a ~*remember*~ buffer containing link and
+       selected content using ~*remember*~ template x
 
        : ::x
 
@@ -246,5 +246,5 @@
 ** Acknowledgements
    
    org-annotation-quicksilver.el is based on org-annotation-helper by
-   /Bastien Guerry/ and /Daniel M German/. It incorporates a slightly modified function from
-   org-remember.el by /Carsten Dominik/.
+   /Bastien Guerry/ and /Daniel M German/. It incorporates a slightly
+   modified function from org-remember.el by /Carsten Dominik/.
