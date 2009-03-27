@@ -51,19 +51,19 @@
 
 **** org-remember.scpt
 
-     - Copy to ~/Library/Application Support/Quicksilver/Actions/
+     - Copy to =~/Library/Application Support/Quicksilver/Actions/=
 
 **** org-note.scpt
 
-     - Copy to ~/Library/Application Support/Quicksilver/Actions/
+     - Copy to =~/Library/Application Support/Quicksilver/Actions/=
 
 **** org-link.scpt
 
-     - Copy to ~/Library/Application Support/Quicksilver/Actions/
+     - Copy to =~/Library/Application Support/Quicksilver/Actions/=
 
 **** orgQSLib
 
-     - Copy this folder to ~/Library/Application Support/Quicksilver/Actions/
+     - Copy this folder to =~/Library/Application Support/Quicksilver/Actions/=
 
 *** Edit your .emacs
 **** Require org-annotation-quicksilver.el
@@ -74,9 +74,9 @@
 
      : (server-start)
 
-**** /Optional:/ Edit the default ~*remember*~ template
+**** /Optional:/ Edit the default =*remember*= template
 
-     A default ~*remember*~ template is provided by
+     A default =*remember*= template is provided by
      org-annotation-quicksilver.el.
 
      - This can be edited to your tastes
@@ -143,19 +143,19 @@
       
 **** Syntax for text panel
 
-     - Append a note using ~*remember*~
+     - Append a note using =*remember*=
        template "QS Inbox"
 
        : foobar
 
-     - Append a note using ~*remember*~ template x
+     - Append a note using =*remember*= template x
 
        : foobar::x
 
 *** org-remember
     Creates a note in an org-mode buffer. Links to the file of the
     front document, and uses selection in front document as
-    initial content of ~*remember*~ buffer.
+    initial content of =*remember*= buffer.
 
     - Invoke Quicksilver
     - Call org-remember
@@ -164,22 +164,22 @@
     
 **** Syntax for text panel
 
-     - Append link and selected content using ~*remember*~ template "QS
+     - Append link and selected content using =*remember*= template "QS
        Inbox"
 
        : [blank]
 
-     - Append note, link and selected content using ~*remember*~
+     - Append note, link and selected content using =*remember*=
        template "QS Inbox"
 
        : foobar
 
-     - Append note, link and selected content using ~*remember*~ template x
+     - Append note, link and selected content using =*remember*= template x
 
        : foobar::x
 
-     - Raise Emacs and initialize a ~*remember*~ buffer containing link and
-       selected content using ~*remember*~ template x
+     - Raise Emacs and initialize a =*remember*= buffer containing link and
+       selected content using =*remember*= template x
 
        : ::x
 
@@ -227,13 +227,13 @@
 
      - Add the following to your .emacs
 
-#+BEGIN_EXAMPLE
-       (require 'org-mairix)
-       (setq org-mairix-open-command "mairix %args% %search%")
-       (setq org-mairix-threaded-links t)
-       (setq org-mairix-mutt-display-command "osascript /pathto/org-mairix-display.scpt %search%")
-       (setq org-mairix-display-hook 'org-mairix-mutt-display-results)
-#+END_EXAMPLE
+#+BEGIN_SRC emacs-lisp
+(require 'org-mairix)
+(setq org-mairix-open-command "mairix %args% %search%")
+(setq org-mairix-threaded-links t)
+(setq org-mairix-mutt-display-command "osascript /pathto/org-mairix-display.scpt %search%")
+(setq org-mairix-display-hook 'org-mairix-mutt-display-results)
+#+END_SRC
 
 *** Mutt support
 
