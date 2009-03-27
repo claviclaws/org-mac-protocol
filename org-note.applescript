@@ -55,8 +55,7 @@ using terms from application "Quicksilver"
 					set theTemplate to last text item in theText
 					set theText to first text item in theText
 					if theTemplate is "" then
-						set rememberFile to "remember"
-						set raiseEmacs to true
+						return 0
 					else
 						set rememberFile to "file"
 						set raiseEmacs to false

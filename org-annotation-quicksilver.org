@@ -3,27 +3,34 @@
 #+AUTHOR: Christopher Suckling
 #+EMAIL: suckling AT gmail DOT com
 #+OPTIONS: num:nil
-#+INFOJS_OPT: path:org-info.js view:info
+#+INFOJS_OPT: path:org-info.js
+#+INFOJS_OPT: view:info mouse:underline
 
-  Version: 0.609
+  Version: 0.624
 
-  A suite of scripts that allow the user to make annotations to their
-  org-mode buffers without switching focus to Emacs from other OS X
-  applications. 
+  A suite of scripts that allow the user to annotate their org-mode
+  buffers without switching focus from other OS X applications to
+  Emacs.
 
 ** Included files
-
+   
+   - org-annotation-quicksilver.html (this file)
    - org-annotation-quicksilver.org (source for this manual)
    - org-annotation-quicksilver.el
    - org-remember.scpt
    - org-note.scpt
    - org-link.scpt
+   - orgQSLib (AppleScript libraries)
+     - getEmacsClient.scpt
+     - getItemMetadata.scpt
 
-     /Optional/ (provides org-mairix integration)
 
-   - org-mairix-display.scpt
-   - org-mairix-link.sh
-   - mutt.terminal
+   /Optional/ (provides org-mairix integration)
+
+   - mutt
+     - org-mairix-display.scpt
+     - org-mairix-link.sh
+     - mutt.terminal
 
 ** Requirements
 
@@ -54,8 +61,131 @@
 
      - Copy to ~/Library/Application Support/Quicksilver/Actions/
 
+**** orgQSLib
 
-*** /Optional/ install org-mairix files 
+     - Copy this folder to ~/Library/Application Support/Quicksilver/Actions/
+
+*** Edit your .emacs
+**** Require org-annotation-quicksilver.el
+
+      : (require 'org-annotation-quicksilver)
+
+**** Run emacsserver
+
+     : (server-start)
+
+**** /Optional:/ Edit the default ~*remember*~ template
+
+     A default ~*remember*~ template is provided by
+     org-annotation-quicksilver.el.
+
+     - This can be edited to your tastes
+
+       The default is:
+
+       : ("QS Inbox" ?q "\n* QS %U%?\n%i\n%a" (concat org-directory "inbox.org") "QS Inbox")
+       
+       This template can be fairly flexible. The only essential
+       variables are *?q* (the template selection character), *%a* (the
+       link to the front document), and *%i* (the selection within the
+       front document). Please see the [[http://orgmode.org/manual/Remember-templates.html#Remember-templates][org manual]] for further details
+       on template customization.
+
+*** Edit orgQSLib/getEmacsClient.scpt
+    
+    - Edit the path to emacsclient for your flavour of Emacs
+      
+      Users of Carbon Emacs and those who have compiled Emacs from CVS
+      should find the default setting adequate. Aquamacs users will
+      have to edit this path.
+*** Ensure all scripts are loaded
+
+    - eval .emacs
+    - Restart Quicksilver
+
+** Usage
+*** Currently supported applications
+
+    - Finder
+    - Safari
+    - Mail
+    - Skim
+    - BibDesk
+
+    - Unsupported applications that are AppleScript aware will attempt
+      to create links to the front document, but do not support
+      selected content.      
+      
+*** org-link
+    Creates an org-mode link from the front document and passes it to
+    emacsclient, adding it to the kill-ring.
+
+    - Invoke Quicksilver
+    - Call org-link
+    - Run
+      
+**** Application specific notes
+
+     - Safari\\
+       Links to the URL of the front document.
+
+     - Other supported applications\\
+       Links to the file of the front document.
+
+*** org-note
+    Creates a note in an org-mode buffer. Does not link to the front
+    document.
+
+    - Invoke Quicksilver
+    - Call org-note
+    - Tab to text panel
+    - Enter note
+      
+**** Syntax for text panel
+
+     - Append a note using ~*remember*~
+       template "QS Inbox"
+
+       : foobar
+
+     - Append a note using ~*remember*~ template x
+
+       : foobar::x
+
+*** org-remember
+    Creates a note in an org-mode buffer. Links to the file of the
+    front document, and uses selection in front document as
+    initial content of ~*remember*~ buffer.
+
+    - Invoke Quicksilver
+    - Call org-remember
+    - Tab to text panel
+    - Enter note
+    
+**** Syntax for text panel
+
+     - Append link and selected content using ~*remember*~ template "QS
+       Inbox"
+
+       : [blank]
+
+     - Append note, link and selected content using ~*remember*~
+       template "QS Inbox"
+
+       : foobar
+
+     - Append note, link and selected content using ~*remember*~ template x
+
+       : foobar::x
+
+     - Raise Emacs and initialize a *remember* buffer containing link and
+       selected content using *remember* template x
+
+       : ::x
+
+** /Optional:/ org-mairix integration
+   Please note that these scripts are unlikely to be updated or supported.
+*** Install org-mairix files 
 **** org-mairix-display.scpt
 
      - Copy file to your mutt configuration directory
@@ -68,34 +198,10 @@
     
      - Import the file into Terminal.app
 
-       *Preferences...* - *Settings* - *Actions drop down menu* - *Import...*
+       : Preferences... - Settings - Actions drop down menu - Import...
 
-
-*** Edit your .emacs
-**** Require org-annotation-quicksilver.el
-
-      : (require 'org-annotation-quicksilver)
-
-**** Run emacsserver
-
-     : (server-start)
-
-**** Create a default ~*remember*~ template
-
-    - Add to your list of /org-remember-templates/
-
-      An example would be:
-
-     : ("QS Inbox" ?q "\n* %?\n%U\n%i\n%a" "~/path to org files/inbox.org" "QS Inbox")
-
-      This template can be fairly flexible. The only essential
-      variables are *?q* (the template selection character), *%a* (the
-      link to the front document), and *%i* (the selection within the
-      front document). Please see the [[http://orgmode.org/manual/Remember-templates.html#Remember-templates][org manual]] for further details
-      on template customization.
-
-
-*** /Optional/ org-mairix integration
+*** :source .muttrc 
+*** org-mairix integration
 **** Edit org-mairix-display.scpt
      
      - Edit all occurances of
@@ -129,108 +235,16 @@
        (setq org-mairix-display-hook 'org-mairix-mutt-display-results)
 #+END_EXAMPLE
 
+*** Mutt support
 
-*** Ensure all scripts are ready for use
-
-    - eval .emacs
-    - Restart Quicksilver
-    - /Optional/ :source .muttrc 
-
-** Usage
-*** Currently supported applications
-
-    - Finder
-    - Safari
-    - Mail
-    - Skim
-    - BibDesk
-    - mutt (using mairix as an index and runinng in a Termail.app
-      window) N.B. mutt is only supported by org-link.
-
-    - Unsupported applications that are AppleScript aware will attempt
-      to create links to the front document, but do not support
-      selected content.      
-      
-*** org-link
-    Creates an org-mode link from the front document and passes it to
-    emacsclient, adding it to the kill-ring.
-
-    - Invoke Quicksilver
-    - Call org-link
-    - Run
-
-**** Application specific notes
-
-     - mutt\\
-       This is currently the only part of the suite that extracts
-       links from mutt. Links are in the form of mairix queries to the
-       Message-ID of the message. The subject of the message is given
-       as the title of the link.
-
-     - Safari\\
-       Links to the URL of the front document.
-
-     - Other supported applications\\
-       Links to the file of the front document.
-
-*** org-note
-    Creates a note in an org-mode buffer. Does not link to the front
-    document.
-
-    - Invoke Quicksilver
-    - Call org-note
-    - Tab to text panel
-    - Enter note
-
-**** Syntax for text panel
-
-     - Append a note using ~*remember*~
-       template "QS Inbox"
-
-       : foobar
-
-     - Append a note using ~*remember*~ template x
-
-       : foobar::x
-
-     - Raise Emacs and initialize an empty ~*remember*~ buffer
-
-       : foobar::
-
-*** org-remember
-    Creates a note in an org-mode buffer. Links to the file of the
-    front document, and provides selection in front document as
-    initial content of ~*remember*~ buffer.
-
-    - Invoke Quicksilver
-    - Call org-note
-    - Tab to text panel
-    - Enter note
-    
-**** Syntax for text panel
-
-     - Append link and selected content using ~*remember*~ template "QS
-       Inbox"
-
-       : [blank]
-
-     - Append note, link and selected content using ~*remember*~
-       template "QS Inbox"
-
-       : foobar
-
-     - Append note, link and selected content using ~*remember*~ template x
-
-       : foobar::x
-
-     - Raise Emacs and initialize a *remember* buffer containing link and
-       selected content using *remember* template x
-
-       : ::x
+    Mutt is only supported by org-link. Links extracted from mutt
+    messaged are in the form of mairix queries to the Message-ID of
+    the message. The subject of the message is given as the title of
+    the link.
 
 
 ** Acknowledgements
    
    org-annotation-quicksilver.el is based on org-annotation-helper by
-   [bzg] and [dmg]. It incorporates slightly modified functions from
-   org-remember.el by Carsten Dominik.
+   /Bastien Guerry/ and /Daniel M German/. It incorporates a slightly modified function from
+   org-remember.el by /Carsten Dominik/.
