@@ -56,9 +56,6 @@
 
 (autoload 'url-unhex-string "url")
 
-(add-to-list 'org-remember-templates
-	     '("QS Inbox" ?q "\n* QS %U%?\n%i\n%a" (concat org-directory "inbox.org") "Inbox") 'append)
-
 (defun org-qs-remember-annotation ()
   (if (string= noAnnotation "true")
       (progn
@@ -122,7 +119,9 @@ annotation://   squirrel away a link of the form [[url][title]] that can
 	  ;; duplication of two org-remember functions
 	  (raise-frame)
 	  (cond ((equal proto "remember")
-		 (let* ((remember-mode-hook 'org-remember-apply-template))
+		 (let* ((remember-mode-hook 'org-remember-apply-template)
+			(org-remember-templates 
+			 (append '(("QS Inbox" ?q "\n* QS %U%?\n%i\n%a" (concat org-directory "inbox.org") "Inbox")) org-remember-templates)))
 		   (org-remember-qs nil theTemplate))
 		 (if (string= remember-or-file "file")
 		     (org-remember-finalize)))
