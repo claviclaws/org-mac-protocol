@@ -3,7 +3,7 @@ getItemMetadate.scpt --- retrieve information about selected items and create li
 
 Author: Christopher Suckling <suckling AT gmail DOT com>
 
-Vesion: 0.624
+Vesion: 0.627
 
 Commentary
 
@@ -20,11 +20,11 @@ Please see org-annotation-quicksilver.org for full installation and usage instru
 on getItemMetadata(theProtocol, theApp)
 	if (theApp as string) = "Safari" then
 		tell application "Safari"
-			set theURL to do JavaScript "document.URL" in document 1
-			set theTitle to do JavaScript "escape(document.title)" in document 1
-			set theContent to do JavaScript "escape(window.getSelection())" in document 1
+			set theURL to do JavaScript "encodeURIComponent(document.URL)" in document 1
+			set theTitle to do JavaScript "encodeURIComponent(document.title)" in document 1
+			set theContent to do JavaScript "encodeURIComponent(window.getSelection())" in document 1
 			
-			set theLink to theProtocol & theURL & "::remember::" & theTitle & "::remember::" & theContent
+			set theLink to theProtocol & theURL & "/" & theTitle & "/" & theContent
 		end tell
 		
 	else
@@ -32,12 +32,19 @@ on getItemMetadata(theProtocol, theApp)
 		if (theApp as string) = "Skim" then
 			tell application "Skim"
 				
+				set theScheme to "file:/"
 				set theDoc to front document
 				set theTitle to name of theDoc
 				set thePath to path of theDoc
 				set theSelection to selection of theDoc
 				set theContent to get text for theSelection
-				set theLink to theProtocol & "file:/" & thePath & "::remember::" & theTitle & "::remember::" & theContent
+				
+				set escScheme to URI Escape theScheme
+				set escTitle to URI Escape theTitle additional "/"
+				set escPath to URI Escape thePath additional "/"
+				set escContent to URI Escape theContent additional "/"
+				
+				set theLink to theProtocol & escScheme & escPath & "/" & escTitle & "/" & escContent
 			end tell
 			
 		else
@@ -56,6 +63,7 @@ on getItemMetadata(theProtocol, theApp)
 </$pubType?>
 </$publications>
 "
+					set theScheme to "file:/"
 					set theDoc to front document
 					set theTitle to name of theDoc
 					set thePath to path of theDoc
@@ -63,7 +71,14 @@ on getItemMetadata(theProtocol, theApp)
 					set thePub to item 1 of theSelection
 					set theContent to templated text of theDoc using text templateText for thePub
 					set theCite to cite key of thePub
-					set theLink to theProtocol & "file:/" & thePath & "::" & theCite & "::remember::" & theTitle & "::" & theCite & "::remember::" & theContent
+					
+					set escScheme to URI Escape theScheme
+					set escTitle to URI Escape theTitle additional "/"
+					set escCite to URI Escape theCite additional "/"
+					set escPath to URI Escape thePath additional "/"
+					set escContent to URI Escape theContent additional "/"
+					
+					set theLink to theProtocol & "file:/" & escPath & "::" & escCite & "/" & escTitle & "::" & escCite & "/" & escContent
 				end tell
 				
 			else
@@ -76,7 +91,14 @@ on getItemMetadata(theProtocol, theApp)
 							set theID to message id of theMessage
 							set thesubject to subject of theMessage
 						end repeat
-						set theLink to theProtocol & "message://" & theID & "::remember::" & thesubject & "::remember::"
+						
+						set theScheme to "message://"
+						
+						set escID to URI Escape theID additional "/"
+						set escSubject to URI Escape thesubject additional "/"
+						set escScheme to URI Escape theScheme additional "/"
+						
+						set theLink to theProtocol & escScheme & theID & "/" & thesubject
 					end tell
 					
 					
@@ -84,12 +106,16 @@ on getItemMetadata(theProtocol, theApp)
 					
 					if (theApp as string) = "Finder" then
 						tell application "Finder"
+							set theScheme to "file:/"
 							set theItem to selection as alias
 							set thePath to POSIX path of theItem
 							set theTitle to name of (get info for theItem)
-							set theContent to ""
 							
-							set theLink to theProtocol & "file:/" & thePath & "::remember::" & theTitle & "::remember::"
+							set escScheme to URI Escape additional "/"
+							set escPath to URI Escape additional "/"
+							set escTitle to URI Escape additional "/"
+							
+							set theLink to theProtocol & escScheme & escPath & "/" & escTitle
 						end tell
 						
 					else
@@ -105,10 +131,16 @@ on getItemMetadata(theProtocol, theApp)
 						else
 							
 							tell application (theApp as string)
+								set theScheme to "file:/"
 								set theDoc to front document
 								set theTitle to name of theDoc
 								set thePath to path of theDoc
-								set theLink to theProtocol & "file:/" & thePath & "::remember::" & theTitle & "::remember::"
+								
+								set escScheme to URI Escape theScheme additional "/"
+								set escPath to URI Escape thePath additional "/"
+								set escTitle to URI Escape theTitle additional "/"
+								
+								set theLink to theProtocol & escScheme & escPath & "/" & escTitle
 							end tell
 							
 						end if

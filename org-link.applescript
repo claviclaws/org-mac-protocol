@@ -3,7 +3,7 @@ org-link.scpt --- extract an org-mode link from the front document and pass it t
 
 Author: Christopher Suckling <suckling AT gmail DOT com>
 
-Version: 0.624
+Version: 0.627
 
 Commentary
 
@@ -33,7 +33,7 @@ Please see org-annotation-quicksilver.org for full installation and usage instru
 property orgQSLib : ((path to home folder as text) & "Library:Application Support:Quicksilver:Actions:orgQSLib:")
 property getEmacsLib : load script ((orgQSLib as text) & "getEmacsClient.scpt") as alias
 property getItemMetaLib : load script ((orgQSLib as text) & "getItemMetadata.scpt") as alias
-property theProtocol : "annotation://"
+property theProtocol : "org-protocol:/store-link:/"
 
 using terms from application "Quicksilver"
 	
@@ -41,8 +41,12 @@ using terms from application "Quicksilver"
 		set theApp to item 1 of (get name of processes whose frontmost is true)
 	end tell
 	
+	(*
 	set theFunction to "org-annotation-helper-remember"
 	set theScript to getEmacsLib's getEmacsClient() & " -e \"(progn (" & theFunction & " \\\"" & getItemMetaLib's getItemMetadata(theProtocol, theApp) & "\\\") nil)\""
+*)
+	
+	set theScript to getEmacsLib's getEmacsClient() & " " & getItemMetaLib's getItemMetadata(theProtocol, theApp)
 	
 	do shell script theScript
 	
