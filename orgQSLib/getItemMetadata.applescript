@@ -1,5 +1,5 @@
 (*
-getItemMetadate.scpt --- retrieve information about selected items and create links to them
+getItemMetadata.scpt --- retrieve information about selected items and create links to them
 
 Author: Christopher Suckling <suckling AT gmail DOT com>
 
@@ -18,13 +18,24 @@ Please see org-annotation-quicksilver.org for full installation and usage instru
 
 
 on getItemMetadata(theProtocol, theApp)
+	set theErrorURL to POSIX path of (path to application theApp)
+	set theErrorMessage to theApp & ": no AppleScript support"
+	set escErrorURL to URI Escape theErrorURL additional "@#$%^&*(){}[]=:/,;?+"
+	set escErrorMessage to URI Escape theErrorMessage additional "~!@#$%^&*(){}[]=:/,;?+"
+	
+	set escApp to URI Escape theApp additional "~!@#$%^&*(){}[]=:/,;?+"
+	
 	if (theApp as string) = "Safari" then
 		tell application "Safari"
-			set theURL to do JavaScript "encodeURIComponent(document.URL)" in document 1
-			set theTitle to do JavaScript "encodeURIComponent(document.title)" in document 1
-			set theContent to do JavaScript "encodeURIComponent(window.getSelection())" in document 1
+			set theURL to do JavaScript "document.URL" in document 1
+			set theTitle to do JavaScript "document.title" in document 1
+			set theContent to do JavaScript "window.getSelection()" in document 1
 			
-			set theLink to theProtocol & theURL & "/" & theTitle & "/" & theContent
+			set escURL to URI Escape theURL additional "~!@#$%^&*(){}[]=:/,;?+"
+			set escTitle to URI Escape theTitle additional "~!@#$%^&*(){}[]=:/,;?+"
+			set escContent to URI Escape theContent additional "~!@#$%^&*(){}[]=:/,;?+"
+			
+			set theLink to theProtocol & escURL & "/" & escTitle & "/" & escContent & ":" & escApp
 		end tell
 		
 	else
@@ -37,14 +48,14 @@ on getItemMetadata(theProtocol, theApp)
 				set theTitle to name of theDoc
 				set thePath to path of theDoc
 				set theSelection to selection of theDoc
-				set theContent to get text for theSelection
+				set theContent to contents of (get text for theSelection)
 				
-				set escScheme to URI Escape theScheme
-				set escTitle to URI Escape theTitle additional "/"
-				set escPath to URI Escape thePath additional "/"
-				set escContent to URI Escape theContent additional "/"
+				set escScheme to URI Escape theScheme additional "~!@#$%^&*(){}[]=:/,;?+"
+				set escTitle to URI Escape theTitle additional "~!@#$%^&*(){}[]=:/,;?+"
+				set escPath to URI Escape thePath additional "~!@#$%^&*(){}[]=:/,;?+"
+				set escContent to URI Escape theContent additional "~!@#$%^&*(){}[]=:/,;?+"
 				
-				set theLink to theProtocol & escScheme & escPath & "/" & escTitle & "/" & escContent
+				set theLink to theProtocol & escScheme & escPath & "/" & escTitle & "/" & escContent & ":" & escApp
 			end tell
 			
 		else
@@ -65,20 +76,20 @@ on getItemMetadata(theProtocol, theApp)
 "
 					set theScheme to "file:/"
 					set theDoc to front document
-					set theTitle to name of theDoc
-					set thePath to path of theDoc
+					set theTitle to (name of theDoc) & "::"
+					set thePath to (path of theDoc) & "::"
 					set theSelection to the selection of theDoc
 					set thePub to item 1 of theSelection
 					set theContent to templated text of theDoc using text templateText for thePub
 					set theCite to cite key of thePub
 					
-					set escScheme to URI Escape theScheme
-					set escTitle to URI Escape theTitle additional "/"
-					set escCite to URI Escape theCite additional "/"
-					set escPath to URI Escape thePath additional "/"
-					set escContent to URI Escape theContent additional "/"
+					set escScheme to URI Escape theScheme additional "~!@#$%^&*(){}[]=:/,;?+"
+					set escTitle to URI Escape theTitle additional "~!@#$%^&*(){}[]=:/,;?+"
+					set escCite to URI Escape theCite additional "~!@#$%^&*(){}[]=:/,;?+"
+					set escPath to URI Escape thePath additional "~!@#$%^&*(){}[]=:/,;?+"
+					set escContent to URI Escape theContent additional "~!@#$%^&*(){}[]=:/,;?+"
 					
-					set theLink to theProtocol & "file:/" & escPath & "::" & escCite & "/" & escTitle & "::" & escCite & "/" & escContent
+					set theLink to theProtocol & escScheme & escPath & escCite & "/" & escTitle & escCite & "/" & escContent & ":" & "escApp"
 				end tell
 				
 			else
@@ -94,11 +105,11 @@ on getItemMetadata(theProtocol, theApp)
 						
 						set theScheme to "message://"
 						
-						set escID to URI Escape theID additional "/"
-						set escSubject to URI Escape thesubject additional "/"
-						set escScheme to URI Escape theScheme additional "/"
+						set escID to URI Escape theID additional "~!@#$%^&*(){}[]=:/,;?+"
+						set escSubject to URI Escape thesubject additional "~!@#$%^&*(){}[]=:/,;?+"
+						set escScheme to URI Escape theScheme additional "~!@#$%^&*(){}[]=:/,;?+"
 						
-						set theLink to theProtocol & escScheme & theID & "/" & thesubject
+						set theLink to theProtocol & escScheme & theID & "/" & thesubject & ":" & "escApp"
 					end tell
 					
 					
@@ -111,11 +122,11 @@ on getItemMetadata(theProtocol, theApp)
 							set thePath to POSIX path of theItem
 							set theTitle to name of (get info for theItem)
 							
-							set escScheme to URI Escape additional "/"
-							set escPath to URI Escape additional "/"
-							set escTitle to URI Escape additional "/"
+							set escScheme to URI Escape theScheme additional "~!@#$%^&*(){}[]=:/,;?+"
+							set escPath to URI Escape thePath additional "~!@#$%^&*(){}[]=:/,;?+"
+							set escTitle to URI Escape theTitle additional "~!@#$%^&*(){}[]=:/,;?+"
 							
-							set theLink to theProtocol & escScheme & escPath & "/" & escTitle
+							set theLink to theProtocol & escScheme & escPath & "/" & escTitle & ":" & escApp
 						end tell
 						
 					else
@@ -129,18 +140,24 @@ on getItemMetadata(theProtocol, theApp)
 							end tell
 							
 						else
-							
 							tell application (theApp as string)
 								set theScheme to "file:/"
-								set theDoc to front document
-								set theTitle to name of theDoc
-								set thePath to path of theDoc
+								set escScheme to URI Escape theScheme additional "~!@#$%^&*(){}[]=:/,;?+"
+								set appUnsupported to false
+								try
+									set theDoc to front document
+								on error
+									set theLink to theProtocol & escScheme & escErrorURL & "/" & escErrorMessage
+									set appUnsupported to true
+								end try
+								if appUnsupported is false then
+									set theTitle to name of theDoc
+									set thePath to path of theDoc
+									set escPath to URI Escape thePath additional "~!@#$%^&*(){}[]=:/,;?+"
+									set escTitle to URI Escape theTitle additional "~!@#$%^&*(){}[]=:/,;?+"
+									set theLink to theProtocol & escScheme & escPath & "/" & escTitle & ":" & escApp
+								end if
 								
-								set escScheme to URI Escape theScheme additional "/"
-								set escPath to URI Escape thePath additional "/"
-								set escTitle to URI Escape theTitle additional "/"
-								
-								set theLink to theProtocol & escScheme & escPath & "/" & escTitle
 							end tell
 							
 						end if
