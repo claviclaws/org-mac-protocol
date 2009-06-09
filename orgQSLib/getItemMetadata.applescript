@@ -89,7 +89,7 @@ on getItemMetadata(theProtocol, theApp)
 					set escPath to URI Escape thePath additional "~!@#$%^&*(){}[]=:/,;?+"
 					set escContent to URI Escape theContent additional "~!@#$%^&*(){}[]=:/,;?+"
 					
-					set theLink to theProtocol & escScheme & escPath & escCite & "/" & escTitle & escCite & "/" & escContent & ":" & "escApp"
+					set theLink to theProtocol & escScheme & escPath & escCite & "/" & escTitle & escCite & "/" & escContent & ":" & escApp
 				end tell
 				
 			else
