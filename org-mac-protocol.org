@@ -30,7 +30,7 @@
 ** Obtaining
    An archive can be downloaded [[http://claviclaws.net/org/org-mac-protocol.dmg][here]].
 
-   A git repository can be found [[git://github.com/claviclaws/org-mac-protocol.git][here]].
+   A git repository can be found at =git://github.com/claviclaws/org-mac-protocol.git=
 
    The git repository does not contain the [[http://homepage.mac.com/tkurita/scriptfactory/Softwares/OSAX/URIEscape/manual/en/index.html][URI Escape]] scripting addition.
 
