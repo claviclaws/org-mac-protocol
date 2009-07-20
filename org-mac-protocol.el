@@ -167,4 +167,4 @@ buffer is filed)"
     (org-protocol-remember info))
   nil)
 
-(provide 'org-mac-protocol.el)
+(provide 'org-mac-protocol)
