@@ -1,10 +1,11 @@
 * org-mac-protocol manual
 #+TITLE: org-mac-protocol manual
 #+AUTHOR: Christopher Suckling
-#+EMAIL: suckling AT gmail DOT com
-#+OPTIONS: num:nil
+#+EMAIL: suckling@gmail.com
+#+OPTIONS: num:nil 
+#+STYLE: <link rel="stylesheet" type="text/css" href="stylesheet.css" />
 #+INFOJS_OPT: path:org-info.js
-#+INFOJS_OPT: view:info mouse:underline
+#+INFOJS_OPT: toc:nil localtoc:t view:info mouse:underline
 
   : Version: 0.628
 
@@ -36,23 +37,23 @@
 
    - OS X 10.5 (untested on previous versions)
 
-   - [[http://orgmode.org][Org-Mode]] 6.28 or above
+   - [[http://orgmode.org][Org-Mode]] 6.28 or above (untested on previous versions)
    - [[https://gna.org/p/remember-el][Remember]]
 
 ** Obtaining
-   An archive can be downloaded [[http://claviclaws.net/org/omp0628.dmg][here]].
+   An archive can be downloaded [[http://claviclaws.net/org/org-mac-protocol.dmg][here]].
 
 ** Installation and configuration
 *** Install files
-**** org-mac-protocol.pkg
+**** =org-mac-protocol.pkg= - OS X 10.5 only 
 
     - Launch the installer and follow on screen instructions.  You
       must set a location for org-mac-protocol.el that is on your
       Emacs load-path.
 
-**** Manual installation
+**** Manual installation - OS X 10.4
 
-    - Copy files from the sources directory to their relevant
+    - Copy files from the =sources= directory to their relevant
       locations.
       
       =org-mac-protocol.el= should be placed on your Emacs load-path.
@@ -61,14 +62,23 @@
       =~/Library/Scripts/=.
 
       =URI Escape.osax= should be placed in
-      =~/Library/ScriptingAdditions/=, creating the directory if necessary.
+      =~/Library/ScriptingAdditions/=, creating the directory if
+      necessary. =URI Escape.osax= is found on the
+      =URIEscape1.1.2.dmg= disk image.
+
 
 *** Edit your .emacs
 **** Require org-mac-protocol.el
 
      : (require 'org-mac-protocol)
 
-**** Run emacsserver
+     or
+     
+     : (add-to-list 'org-modules 'org-mac-protocol)
+
+     (must be set before org-mode is loaded)
+
+**** Start emacsserver
 
      : (server-start)
 
@@ -97,6 +107,7 @@
        Please see the [[http://orgmode.org/manual/Remember-templates.html#Remember-templates][org manual]] and the [[http://orgmode.org/worg/org-contrib/org-protocol.php][org-protocol.el manual]] for
        further details on template customisation.
 
+**** Eval .emacs
 *** Edit orgQSLib/getEmacsClient.scpt
     
     - Set =theEmacsClient= to point to emacsclient for your flavour of Emacs.
@@ -170,3 +181,5 @@
    The pop up remember buffer is developed from a blog post by [[http://metajack.im/2008/12/30/gtd-capture-with-emacs-orgmode/][Jack Moffitt]].
 
    [[http://homepage.mac.com/tkurita/scriptfactory/Softwares/OSAX/URIEscape/manual/en/index.html][URI Escape]] is by Tetsuro Kurita.
+
+   org-info.js and CSS stylesheet by [[http://orgmode.org/worg/code/org-info-js/][Sebastian Rose]]
