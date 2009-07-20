@@ -20,7 +20,7 @@
 ;; Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
 ;; Boston, MA 02110-1301, USA.
 
-;; Version: 0.627
+;; Version: 0.628
 ;; Keywords: outlines, hyperlinks, wp
 
 ;;; Commentary
@@ -51,12 +51,24 @@
 ;; Portions of this code are developed from a blog post by Jack Moffitt:
 ;; http://metajack.im/2008/12/30/gtd-capture-with-emacs-orgmode/
 
-(require 'org-protocol)
+
+;; Customize 
+
+;; See the Org-Mode manual and
+;; http://orgmode.org/worg/org-contrib/org-protocol.php
+;; for further details.
+;; If you choose to alter the selection characters (by default ?y and
+;; ?z), then you *must* also alter theProtocol variable in
+;; org-remember.scpt and org-note.scpt to reflect your changes.
 
 (add-to-list 'org-remember-templates
-	     '("AppleScript remember" ?y "* %?\n\n  Source: %u, %c\n\n  %i" "~/Sites/org/inbox.org" "Notes"))
+	     '("AppleScript remember" ?y "* %?\n\n  Source: %u, %c\n\n  %i" (concat org-directory "inbox.org") "Remember"))
 (add-to-list 'org-remember-templates
-	     '("AppleScript note" ?z "* %?\n\n  Source: %u\n" "~/Sites/org/inbox.org" "Notes"))
+	     '("AppleScript note" ?z "* %?\n\n  Source: %u\n" (concat org-directory "inbox.org") "Notes"))
+
+;; /Customize
+
+(require 'org-protocol)
 
 (add-to-list 'org-protocol-protocol-alist
 	     '("org-mac-remember"
@@ -68,13 +80,13 @@
   "The application that AppleScript will acticate
 after the remember buffer is killed")
 (defvar width-of-display (x-display-pixel-width)
-  "For some reason, (x-display-pixel-width)
-returns corrupted values when called during function;
-this ensures that correct value is returned.")
+  "For some reason, (x-display-pixel-width) returns corrupted
+values when called during (org-mac-protocol-remember); this
+ensures that correct value is returned")
 (defvar height-of-display (x-display-pixel-height)
-  "For some reason, (x-display-pixel-height)
-returns corrupted values when called during function;
-this ensures that correct value is returned")
+  "For some reason, (x-display-pixel-height) returns corrupted
+values when called during (org-mac-protocol-remember); this
+ensures that correct value is returned")
 
 (defadvice remember-finalize (after delete-remember-frame activate)  
   "Advise remember-finalize to close the frame if it is the mac-remember frame"  
@@ -96,7 +108,8 @@ this ensures that correct value is returned")
       "end tell"))))  
 
 (defadvice remember-destroy (after delete-remember-frame activate)  
-  "Advise remember-destroy to close the frame if it is the mac-rememeber frame"  
+  "Advise remember-destroy to close the frame if it is the
+mac-rememeber frame"
   (when (equal "*mac-remember*" (frame-parameter nil 'name))
     (mapc
      (lambda (x)
@@ -115,17 +128,17 @@ this ensures that correct value is returned")
       "end tell"))))  
 
 (defadvice org-remember-apply-template (before delete-non-remember-windows activate)
-  "Advise org-remember to delete non-remember windows if it is
-    in the remember frame"
+  "Advise org-remember to delete non-remember windows if it is in
+the remember frame"
   (when (equal "*mac-remember*" (frame-parameter nil 'name))
     (delete-other-windows)))
 
 
 (defun org-mac-protocol-remember (data)
-  "Process an org-protocol://as-remember:// style url.
+  "Process an org-protocol://mac-remember:// scheme URL.
 Pops up a small Emacs frame containing a remember buffer. Calls
 org-protocol-remember. Destroys the frame after the remember
-buffer is filed."
+buffer is filed)"
 
   (let* ((parts (org-protocol-split-data data nil ":"))
 	 (info (car parts))

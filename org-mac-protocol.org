@@ -1,0 +1,172 @@
+* org-mac-protocol manual
+#+TITLE: org-mac-protocol manual
+#+AUTHOR: Christopher Suckling
+#+EMAIL: suckling AT gmail DOT com
+#+OPTIONS: num:nil
+#+INFOJS_OPT: path:org-info.js
+#+INFOJS_OPT: view:info mouse:underline
+
+  : Version: 0.628
+
+  A suite of scripts that allow the user to annotate their org-mode
+  buffers without switching focus from other OS X applications
+  to Emacs.
+
+  The AppleScripts interface with org-protocol.el to extract content
+  from, and link to, documents and applications. 
+
+  Three modes of interaction are provided:
+
+  =org-link= creates an org-mode link and adds it to =*Org Links*= and
+  the kill-ring.
+
+  =org-remember= pops up a small =*Remember*= frame with links and,
+  where possible, extracted content embedded.
+
+  =org-note= pops up a small =*Remember*= frame for note taking
+  independent of the document being worked on.
+
+** Included files
+   
+   - org-mac-protocol.pkg (installer package)
+   - sources (including Scripting Additions sources)
+   - org-mac-protocol.org (this manual)
+
+** Requirements
+
+   - OS X 10.5 (untested on previous versions)
+
+   - [[http://orgmode.org][Org-Mode]] 6.28 or above
+   - [[https://gna.org/p/remember-el][Remember]]
+
+** Obtaining
+   An archive can be downloaded [[http://claviclaws.net/org/omp0628.dmg][here]].
+
+** Installation and configuration
+*** Install files
+**** org-mac-protocol.pkg
+
+    - Launch the installer and follow on screen instructions.  You
+      must set a location for org-mac-protocol.el that is on your
+      Emacs load-path.
+
+**** Manual installation
+
+    - Copy files from the sources directory to their relevant
+      locations.
+      
+      =org-mac-protocol.el= should be placed on your Emacs load-path.
+
+      The contents of the =Scripts= directory should be placed in
+      =~/Library/Scripts/=.
+
+      =URI Escape.osax= should be placed in
+      =~/Library/ScriptingAdditions/=, creating the directory if necessary.
+
+*** Edit your .emacs
+**** Require org-mac-protocol.el
+
+     : (require 'org-mac-protocol)
+
+**** Run emacsserver
+
+     : (server-start)
+
+**** /Optional:/ Edit the default =*Remember*= templates
+
+     Two default =*Remember*= templates are provided by
+     org-mac-protocol.el.
+     
+     - These can be edited to your tastes
+
+       The defaults are:
+
+       : ("AppleScript remember" ?y "* %?\n\n  Source: %u, %c\n\n  %i" (concat org-directory "inbox.org") "Remember")
+       
+       : ("AppleScript note" ?z "* %?\n\n  Source: %u\n" (concat org-directory "inbox.org") "Notes")
+       
+       This template can be fairly flexible. The only essential items
+       are =?y= and =?z= (the template selection characters), and, for
+       =org-remember=, =%c= (the link to the document), and =%i= (the
+       selection within the document).
+
+       If you choose to alter the template selection characters, you
+       *must* alter =theProtocol= variable in =org-remember.scpt= and
+       =org-note.scpt= to reflect your changes.
+
+       Please see the [[http://orgmode.org/manual/Remember-templates.html#Remember-templates][org manual]] and the [[http://orgmode.org/worg/org-contrib/org-protocol.php][org-protocol.el manual]] for
+       further details on template customisation.
+
+*** Edit orgQSLib/getEmacsClient.scpt
+    
+    - Set =theEmacsClient= to point to emacsclient for your flavour of Emacs.
+      
+      The default setting should work with Carbon Emacs and CVS Emacs.
+      Aquamacs users will have to edit this variable.
+
+** Usage
+   There are three scripts that can be invoked; =org-link=,
+   =org-note=, and =org-remember=. These scripts can be called by
+   various methods, for example, the [[file://Applications/AppleScript/AppleScript%20Utility.app/][Script menu]] in the menu bar,
+   [[http://code.google.com/p/blacktree-alchemy/][Quicksilver]], [[http://www.red-sweater.com/fastscripts/][FastScripts]] etc.
+
+*** Currently supported applications
+
+    |          | org-link           | org-note | org-remember                     |
+    |----------+--------------------+----------+----------------------------------|
+    | Finder   | Link: file         | Yes      | Content: no                      |
+    | Safari   | Link: URL          | Yes      | Content: current selection       |
+    | Mail     | Link: message      | Yes      | Content: entire message          |
+    | Skim     | Link: PDF          | Yes      | Content: current selection       |
+    | BibDesk  | Link: entry        | Yes      | Content: Harvard style citation  |
+    | Terminal | Link: Terminal.app | Yes      | Content: current window contents |
+
+
+    - Unsupported applications that are AppleScript aware will attempt
+      to create links to the front document, but do not support
+      selected content.      
+
+    - Preview.app is /not/ AppleScript aware and Firefox has such
+      limited AppleScript support as to be useless.
+      
+*** org-link
+    Creates an org-mode link from the front document and passes it to
+    emacsclient, adding it to =*Org Links*= and the kill-ring.
+
+    - Run =org-link=
+
+*** org-note
+    Creates a note in an org-mode buffer. Does not link to the front
+    document.
+
+    - Run =org-note=
+    - Enter note in pop-up =*Remember*= buffer
+    - File note to return to previous application
+      
+*** org-remember
+    Creates a note in an org-mode buffer. Links to the file of the
+    front document, and uses selection in front document as
+    initial content of the =*Remember*= buffer.
+
+    - Run =org-remember=
+    - Enter note in pop-up =*Remember*= buffer
+    - File note to return to previous application
+       
+** TODO
+   Support for further applications will also require defining [[http://orgmode.org/manual/Adding-hyperlink-types.html#Adding-hyperlink-types][new
+   org-mode hyperlinks]], as will improvements to linking for PDF files
+   and Terminal. Planned support includes:
+
+   - [ ] Skim (improved)
+   - [ ] Terminal (improved)
+   - [ ] iCal
+   - [ ] Microsoft Office
+   - [ ] iTunes
+   - [ ] iPhoto
+   - [ ] Firefox (if AppleScript support is improved)
+
+** Acknowledgements
+   
+   The pop up remember buffer is developed from a blog post by [[http://metajack.im/2008/12/30/gtd-capture-with-emacs-orgmode/][Jack Moffitt]].
+
+   [[http://homepage.mac.com/tkurita/scriptfactory/Softwares/OSAX/URIEscape/manual/en/index.html][URI Escape]] is by Tetsuro Kurita.

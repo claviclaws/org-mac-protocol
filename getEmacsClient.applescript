@@ -1,5 +1,5 @@
 (*
-org-note.scpt --- make a note in an org-mode file without linking to front document
+getEmacsClient.scpt --- returns the correct path to emacsclient
 
 Copyright (C) 2009 Christopher Suckling
 
@@ -30,25 +30,13 @@ Installation
 
 1) Copy to ~/Library/Scripts/orgQSLib/
 
+2) Edit theEmacsClient to point to your Emacs installation
+
 Please see org-mac-protocol.org for full installation and usage instructions
+
 *)
 
-set ASTID to AppleScript's text item delimiters
-set text item delimiters to {":"}
-set myPath to (path to me) as text
-set orgQSLib to (text items 1 through -2 of myPath) & "orgQSLib:" as text
-set AppleScript's text item delimiters to ASTID
-
-set getEmacsLib to (load script file ((orgQSLib as text) & "getEmacsClient.scpt"))
-set getItemMetaLib to (load script file ((orgQSLib as text) & "getItemMetadata.scpt"))
-set theProtocol to "org-protocol:/mac-remember:/z/"
-
-
-tell application "System Events"
-	set theApp to item 1 of (get name of processes whose frontmost is true)
-end tell
-
-
-set theScript to getEmacsLib's getEmacsClient() & " " & getItemMetaLib's getItemMetadata(theProtocol, theApp)
-
-do shell script theScript
+on getEmacsClient()
+	set theEmacsClient to "/Applications/Emacs.app/Contents/MacOS/bin/emacsclient"
+	return theEmacsClient
+end getEmacsClient
