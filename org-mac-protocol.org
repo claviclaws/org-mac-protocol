@@ -27,6 +27,13 @@
   =org-note= pops up a small =*Remember*= frame for note taking
   independent of the document being worked on.
 
+** Obtaining
+   An archive can be downloaded [[http://claviclaws.net/org/org-mac-protocol.dmg][here]].
+
+   A git repository can be found [[git://github.com/claviclaws/org-mac-protocol.git][here]].
+
+   The git repository does not contain the [[http://homepage.mac.com/tkurita/scriptfactory/Softwares/OSAX/URIEscape/manual/en/index.html][URI Escape]] scripting addition.
+
 ** Included files
    
    - org-mac-protocol.pkg (installer package)
@@ -39,9 +46,6 @@
 
    - [[http://orgmode.org][Org-Mode]] 6.28 or above (untested on previous versions)
    - [[https://gna.org/p/remember-el][Remember]]
-
-** Obtaining
-   An archive can be downloaded [[http://claviclaws.net/org/org-mac-protocol.dmg][here]].
 
 ** Installation and configuration
 *** Install files
@@ -65,7 +69,6 @@
       =~/Library/ScriptingAdditions/=, creating the directory if
       necessary. =URI Escape.osax= is found on the
       =URIEscape1.1.2.dmg= disk image.
-
 
 *** Edit your .emacs
 **** Require org-mac-protocol.el
