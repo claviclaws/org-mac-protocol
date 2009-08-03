@@ -32,41 +32,22 @@
 ;; Installation
 ;;
 ;; Move this file to your elisp load-path and add
-;; (add-to-list 'org-modules 'org-mac-protocol.el)
+;; (require 'org-mac-protocol)
 ;; to your .emacs
 ;;
 ;; Usage
 ;;
-;; You can customize the two org-remember-templates to your own
-;; taste. Please see the org-mode manual for further details. The
-;; first template includes an annotation from the application from
-;; which you called org-remember.scpt. The second is for making notes
-;; without annotations via org-note.scpt. If you change the keys to
-;; trigger these templates, you *must* edit the relevant lines in
-;; org-remember.scpt and org-note.scpt. Please see the documentation
-;; to org-protocol.el for further details.
+;; You must create two org-remember-templates. Please see the
+;; org-mac-protocol manual for sample templates. If you change the
+;; keys to trigger these templates, you *must* edit the relevant lines
+;; in org-remember.scpt and org-note.scpt. Please see the
+;; documentation to org-protocol.el and the org-mode manual for
+;; further assistance with creating templates.
 ;;
 ;; Credit
 ;;
 ;; Portions of this code are developed from a blog post by Jack Moffitt:
 ;; http://metajack.im/2008/12/30/gtd-capture-with-emacs-orgmode/
-
-
-;; Customize 
-
-;; See the Org-Mode manual and
-;; http://orgmode.org/worg/org-contrib/org-protocol.php
-;; for further details.
-;; If you choose to alter the selection characters (by default ?y and
-;; ?z), then you *must* also alter theProtocol variable in
-;; org-remember.scpt and org-note.scpt to reflect your changes.
-
-(add-to-list 'org-remember-templates
-	     '("AppleScript remember" ?y "* %?\n\n  Source: %u, %c\n\n  %i" (concat org-directory "inbox.org") "Remember"))
-(add-to-list 'org-remember-templates
-	     '("AppleScript note" ?z "* %?\n\n  Source: %u\n" (concat org-directory "inbox.org") "Notes"))
-
-;; /Customize
 
 (require 'org-protocol)
 
