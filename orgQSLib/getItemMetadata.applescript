@@ -37,10 +37,10 @@ Please see org-mac-protocol.org for full installation and usage instructions
 on getItemMetadata(theProtocol, theApp)
 	set theErrorURL to POSIX path of (path to application theApp)
 	set theErrorMessage to theApp & ": no AppleScript support"
-	set escErrorURL to URI Escape theErrorURL additional "@#$%^&*(){}[]=:/,;?+"
-	set escErrorMessage to URI Escape theErrorMessage additional "~!@#$%^&*(){}[]=:/,;?+"
+	set escErrorURL to do shell script "ruby -ruri -e 'puts URI.escape(\"" & theErrorURL & "\", /([^0-9A-Za-z-._~])/n)'"
+	set escErrorMessage to do shell script "ruby -ruri -e 'puts URI.escape(\"" & theErrorMessage & "\", /([^0-9A-Za-z-._~])/n)'"
 	
-	set escApp to URI Escape theApp additional "~!@#$%^&*(){}[]=:/,;?+"
+	set escApp to do shell script "ruby -ruri -e 'puts URI.escape(\"" & theApp & "\", /([^0-9A-Za-z-._~])/n)'"
 	
 	if (theApp as string) = "Safari" then
 		tell application "Safari"
@@ -48,9 +48,9 @@ on getItemMetadata(theProtocol, theApp)
 			set theTitle to (do JavaScript "document.title" in document 1) & ":" & theApp
 			set theContent to do JavaScript "window.getSelection()" in document 1
 			
-			set escURL to URI Escape theURL additional "~!@#$%^&*(){}[]=:/,;?+"
-			set escTitle to URI Escape theTitle additional "~!@#$%^&*(){}[]=:/,;?+"
-			set escContent to URI Escape theContent additional "~!@#$%^&*(){}[]=:/,;?+"
+			set escURL to do shell script "ruby -ruri -e 'puts URI.escape(\"" & theURL & "\", /([^0-9A-Za-z-._~])/n)'"
+			set escTitle to do shell script "ruby -ruri -e 'puts URI.escape(\"" & theTitle & "\", /([^0-9A-Za-z-._~])/n)'"
+			set escContent to do shell script "ruby -ruri -e 'puts URI.escape(\"" & theContent & "\", /([^0-9A-Za-z-._~])/n)'"
 			
 			set theLink to theProtocol & escURL & "/" & escTitle & "/" & escContent & ":" & escApp
 		end tell
@@ -67,10 +67,10 @@ on getItemMetadata(theProtocol, theApp)
 				set theSelection to selection of theDoc
 				set theContent to contents of (get text for theSelection)
 				
-				set escScheme to URI Escape theScheme additional "~!@#$%^&*(){}[]=:/,;?+"
-				set escTitle to URI Escape theTitle additional "~!@#$%^&*(){}[]=:/,;?+"
-				set escPath to URI Escape thePath additional "~!@#$%^&*(){}[]=:/,;?+"
-				set escContent to URI Escape theContent additional "~!@#$%^&*(){}[]=:/,;?+"
+				set escScheme to do shell script "ruby -ruri -e 'puts URI.escape(\"" & theScheme & "\", /([^0-9A-Za-z-._~])/n)'"
+				set escTitle to do shell script "ruby -ruri -e 'puts URI.escape(\"" & theTitle & "\", /([^0-9A-Za-z-._~])/n)'"
+				set escPath to do shell script "ruby -ruri -e 'puts URI.escape(\"" & thePath & "\", /([^0-9A-Za-z-._~])/n)'"
+				set escContent to do shell script "ruby -ruri -e 'puts URI.escape(\"" & theContent & "\", /([^0-9A-Za-z-._~])/n)'"
 				
 				set theLink to theProtocol & escScheme & escPath & "/" & escTitle & "/" & escContent & ":" & escApp
 			end tell
@@ -101,12 +101,12 @@ on getItemMetadata(theProtocol, theApp)
 					set theCite to cite key of thePub
 					set theRef to ":" & theApp
 					
-					set escScheme to URI Escape theScheme additional "~!@#$%^&*(){}[]=:/,;?+"
-					set escTitle to URI Escape theTitle additional "~!@#$%^&*(){}[]=:/,;?+"
-					set escCite to URI Escape theCite additional "~!@#$%^&*(){}[]=:/,;?+"
-					set escPath to URI Escape thePath additional "~!@#$%^&*(){}[]=:/,;?+"
-					set escContent to URI Escape theContent additional "~!@#$%^&*(){}[]=:/,;?+"
-					set escRef to URI Escape theRef additional "~!@#$%^&*(){}[]=:/,;?+"
+					set escScheme to do shell script "ruby -ruri -e 'puts URI.escape(\"" & theScheme & "\", /([^0-9A-Za-z-._~])/n)'"
+					set escTitle to do shell script "ruby -ruri -e 'puts URI.escape(\"" & theTitle & "\", /([^0-9A-Za-z-._~])/n)'"
+					set escCite to do shell script "ruby -ruri -e 'puts URI.escape(\"" & theCite & "\", /([^0-9A-Za-z-._~])/n)'"
+					set escPath to do shell script "ruby -ruri -e 'puts URI.escape(\"" & thePath & "\", /([^0-9A-Za-z-._~])/n)'"
+					set escContent to do shell script "ruby -ruri -e 'puts URI.escape(\"" & theContent & "\", /([^0-9A-Za-z-._~])/n)'"
+					set escRef to do shell script "ruby -ruri -e 'puts URI.escape(\"" & theRef & "\", /([^0-9A-Za-z-._~])/n)'"
 					
 					set theLink to theProtocol & escScheme & escPath & escCite & "/" & escTitle & escCite & escRef & "/" & escContent & ":" & escApp
 				end tell
@@ -125,10 +125,10 @@ on getItemMetadata(theProtocol, theApp)
 						
 						set theScheme to "message://"
 						
-						set escID to URI Escape theID additional "~!@#$%^&*(){}[]=:/,;?+"
-						set escSubject to URI Escape thesubject additional "~!@#$%^&*(){}[]=:/,;?+"
-						set escScheme to URI Escape theScheme additional "~!@#$%^&*(){}[]=:/,;?+"
-						set escContent to URI Escape theContent additional "~!@#$%^&*(){}[]=:/,;?+"
+						set escID to do shell script "ruby -ruri -e 'puts URI.escape(\"" & theID & "\", /([^0-9A-Za-z-._~])/n)'"
+						set escSubject to do shell script "ruby -ruri -e 'puts URI.escape(\"" & thesubject & "\", /([^0-9A-Za-z-._~])/n)'"
+						set escScheme to do shell script "ruby -ruri -e 'puts URI.escape(\"" & theScheme & "\", /([^0-9A-Za-z-._~])/n)'"
+						set escContent to do shell script "ruby -ruri -e 'puts URI.escape(\"" & theContent & "\", /([^0-9A-Za-z-._~])/n)'"
 						
 						set theLink to theProtocol & escScheme & escID & "/" & escSubject & "/" & escContent & ":" & escApp
 					end tell
@@ -143,9 +143,9 @@ on getItemMetadata(theProtocol, theApp)
 							set thePath to POSIX path of theItem
 							set theTitle to (name of (get info for theItem)) & ":" & theApp
 							
-							set escScheme to URI Escape theScheme additional "~!@#$%^&*(){}[]=:/,;?+"
-							set escPath to URI Escape thePath additional "~!@#$%^&*(){}[]=:/,;?+"
-							set escTitle to URI Escape theTitle additional "~!@#$%^&*(){}[]=:/,;?+"
+							set escScheme to do shell script "ruby -ruri -e 'puts URI.escape(\"" & theScheme & "\", /([^0-9A-Za-z-._~])/n)'"
+							set escPath to do shell script "ruby -ruri -e 'puts URI.escape(\"" & thePath & "\", /([^0-9A-Za-z-._~])/n)'"
+							set escTitle to do shell script "ruby -ruri -e 'puts URI.escape(\"" & theTitle & "\", /([^0-9A-Za-z-._~])/n)'"
 							
 							set theLink to theProtocol & escScheme & escPath & "/" & escTitle & "/" & ":" & escApp
 						end tell
@@ -158,10 +158,10 @@ on getItemMetadata(theProtocol, theApp)
 									set theContent to contents of selected tab
 								end tell
 								set theScheme to "file:/"
-								set escScheme to URI Escape theScheme additional "~!@#$%^&*(){}[]=:/,;?+"
+								set escScheme to do shell script "ruby -ruri -e 'puts URI.escape(\"" & theScheme & "\", /([^0-9A-Za-z-._~])/n)'"
 								set theName to (name of front window) & ":" & theApp
-								set escName to URI Escape theName additional "~!@#$%^&*(){}[]=:/,;?+"
-								set escContent to URI Escape theContent additional "~!@#$%^&*(){}[]=:/,;?+"
+								set escName to do shell script "ruby -ruri -e 'puts URI.escape(\"" & theName & "\", /([^0-9A-Za-z-._~])/n)'"
+								set escContent to do shell script "ruby -ruri -e 'puts URI.escape(\"" & theContent & "\", /([^0-9A-Za-z-._~])/n)'"
 								
 								set theLink to theProtocol & escScheme & escErrorURL & "/" & escName & "/" & escContent & ":" & escApp
 							end tell
@@ -171,7 +171,7 @@ on getItemMetadata(theProtocol, theApp)
 							if (theApp as string) = "firefox-bin" then
 								tell application "Firefox"
 									set theURL to «class curl» of window 1
-									set escURL to URI Escape theURL additional "~!@#$%^&*(){}[]=:/,;?+"
+									set escURL to do shell script "ruby -ruri -e 'puts URI.escape(\"" & theURL & "\", /([^0-9A-Za-z-._~])/n)'"
 									set theLink to theProtocol & escURL & "/" & escURL & ":" & escApp
 								end tell
 								
@@ -180,7 +180,7 @@ on getItemMetadata(theProtocol, theApp)
 								
 								tell application (theApp as string)
 									set theScheme to "file:/"
-									set escScheme to URI Escape theScheme additional "~!@#$%^&*(){}[]=:/,;?+"
+									set escScheme to do shell script "ruby -ruri -e 'puts URI.escape(\"" & theScheme & "\", /([^0-9A-Za-z-._~])/n)'"
 									set appUnsupported to false
 									try
 										set theDoc to front document
@@ -191,8 +191,8 @@ on getItemMetadata(theProtocol, theApp)
 									if appUnsupported is false then
 										set theTitle to (name of theDoc) & ":" & theApp
 										set thePath to path of theDoc
-										set escPath to URI Escape thePath additional "~!@#$%^&*(){}[]=:/,;?+"
-										set escTitle to URI Escape theTitle additional "~!@#$%^&*(){}[]=:/,;?+"
+										set escPath to do shell script "ruby -ruri -e 'puts URI.escape(\"" & thePath & "\", /([^0-9A-Za-z-._~])/n)'"
+										set escTitle to do shell script "ruby -ruri -e 'puts URI.escape(\"" & theTitle & "\", /([^0-9A-Za-z-._~])/n)'"
 										set theLink to theProtocol & escScheme & escPath & "/" & escTitle & ":" & escApp
 									end if
 								end tell
