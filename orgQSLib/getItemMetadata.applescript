@@ -20,7 +20,7 @@ along with GNU Emacs; see the file COPYING.  If not, write to the
 Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
 Boston, MA 02110-1301, USA.
 
-Vesion: 0.628
+Vesion: 0.630
 
 Commentary
 
@@ -33,27 +33,30 @@ Installation
 Please see org-mac-protocol.org for full installation and usage instructions
 *)
 
+on encodeURIComponent(theURI)
+	set escURI to do shell script "ruby -ruri -e 'puts URI.escape(\"" & theURI & "\", /([^0-9A-Za-z-._~])/n)'"
+end encodeURIComponent
+
 
 on getItemMetadata(theProtocol, theApp)
 	set theErrorURL to POSIX path of (path to application theApp)
 	set theErrorMessage to theApp & ": no AppleScript support"
-	set escErrorURL to do shell script "ruby -ruri -e 'puts URI.escape(\"" & theErrorURL & "\", /([^0-9A-Za-z-._~])/n)'"
-	set escErrorMessage to do shell script "ruby -ruri -e 'puts URI.escape(\"" & theErrorMessage & "\", /([^0-9A-Za-z-._~])/n)'"
+	set escErrorURL to encodeURIComponent(theErrorURL)
+	set escErrorMessage to encodeURIComponent(theErrorMessage)
 	
-	set escApp to do shell script "ruby -ruri -e 'puts URI.escape(\"" & theApp & "\", /([^0-9A-Za-z-._~])/n)'"
+	set escApp to encodeURIComponent(theApp)
 	
 	if (theApp as string) = "Safari" then
 		tell application "Safari"
 			set theURL to do JavaScript "document.URL" in document 1
 			set theTitle to (do JavaScript "document.title" in document 1) & ":" & theApp
 			set theContent to do JavaScript "window.getSelection()" in document 1
-			
-			set escURL to do shell script "ruby -ruri -e 'puts URI.escape(\"" & theURL & "\", /([^0-9A-Za-z-._~])/n)'"
-			set escTitle to do shell script "ruby -ruri -e 'puts URI.escape(\"" & theTitle & "\", /([^0-9A-Za-z-._~])/n)'"
-			set escContent to do shell script "ruby -ruri -e 'puts URI.escape(\"" & theContent & "\", /([^0-9A-Za-z-._~])/n)'"
-			
-			set theLink to theProtocol & escURL & "/" & escTitle & "/" & escContent & ":" & escApp
 		end tell
+		set escURL to encodeURIComponent(theURL)
+		set escTitle to encodeURIComponent(theTitle)
+		set escContent to encodeURIComponent(theContent)
+		
+		set theLink to theProtocol & escURL & "/" & escTitle & "/" & escContent & ":" & escApp
 		
 	else
 		
@@ -66,14 +69,13 @@ on getItemMetadata(theProtocol, theApp)
 				set thePath to path of theDoc
 				set theSelection to selection of theDoc
 				set theContent to contents of (get text for theSelection)
-				
-				set escScheme to do shell script "ruby -ruri -e 'puts URI.escape(\"" & theScheme & "\", /([^0-9A-Za-z-._~])/n)'"
-				set escTitle to do shell script "ruby -ruri -e 'puts URI.escape(\"" & theTitle & "\", /([^0-9A-Za-z-._~])/n)'"
-				set escPath to do shell script "ruby -ruri -e 'puts URI.escape(\"" & thePath & "\", /([^0-9A-Za-z-._~])/n)'"
-				set escContent to do shell script "ruby -ruri -e 'puts URI.escape(\"" & theContent & "\", /([^0-9A-Za-z-._~])/n)'"
-				
-				set theLink to theProtocol & escScheme & escPath & "/" & escTitle & "/" & escContent & ":" & escApp
 			end tell
+			set escScheme to encodeURIComponent(theScheme)
+			set escTitle to encodeURIComponent(theTitle)
+			set escPath to encodeURIComponent(thePath)
+			set escContent to encodeURIComponent(theContent)
+			
+			set theLink to theProtocol & escScheme & escPath & "/" & escTitle & "/" & escContent & ":" & escApp
 			
 		else
 			
@@ -91,7 +93,7 @@ on getItemMetadata(theProtocol, theApp)
 </$pubType?>
 </$publications>
 "
-					set theScheme to "file:/"
+					set theScheme to "bibdesk:"
 					set theDoc to front document
 					set theTitle to (name of theDoc) & "::"
 					set thePath to (path of theDoc) & "::"
@@ -100,16 +102,15 @@ on getItemMetadata(theProtocol, theApp)
 					set theContent to templated text of theDoc using text templateText for thePub
 					set theCite to cite key of thePub
 					set theRef to ":" & theApp
-					
-					set escScheme to do shell script "ruby -ruri -e 'puts URI.escape(\"" & theScheme & "\", /([^0-9A-Za-z-._~])/n)'"
-					set escTitle to do shell script "ruby -ruri -e 'puts URI.escape(\"" & theTitle & "\", /([^0-9A-Za-z-._~])/n)'"
-					set escCite to do shell script "ruby -ruri -e 'puts URI.escape(\"" & theCite & "\", /([^0-9A-Za-z-._~])/n)'"
-					set escPath to do shell script "ruby -ruri -e 'puts URI.escape(\"" & thePath & "\", /([^0-9A-Za-z-._~])/n)'"
-					set escContent to do shell script "ruby -ruri -e 'puts URI.escape(\"" & theContent & "\", /([^0-9A-Za-z-._~])/n)'"
-					set escRef to do shell script "ruby -ruri -e 'puts URI.escape(\"" & theRef & "\", /([^0-9A-Za-z-._~])/n)'"
-					
-					set theLink to theProtocol & escScheme & escPath & escCite & "/" & escTitle & escCite & escRef & "/" & escContent & ":" & escApp
 				end tell
+				set escScheme to encodeURIComponent(theScheme)
+				set escTitle to encodeURIComponent(theTitle)
+				set escCite to encodeURIComponent(theCite)
+				set escPath to encodeURIComponent(thePath)
+				set escContent to encodeURIComponent(theContent)
+				set escRef to encodeURIComponent(theRef)
+				
+				set theLink to theProtocol & escScheme & escPath & escCite & "/" & escTitle & escCite & escRef & "/" & escContent & ":" & escApp
 				
 			else
 				
@@ -124,14 +125,13 @@ on getItemMetadata(theProtocol, theApp)
 						end repeat
 						
 						set theScheme to "message://"
-						
-						set escID to do shell script "ruby -ruri -e 'puts URI.escape(\"" & theID & "\", /([^0-9A-Za-z-._~])/n)'"
-						set escSubject to do shell script "ruby -ruri -e 'puts URI.escape(\"" & thesubject & "\", /([^0-9A-Za-z-._~])/n)'"
-						set escScheme to do shell script "ruby -ruri -e 'puts URI.escape(\"" & theScheme & "\", /([^0-9A-Za-z-._~])/n)'"
-						set escContent to do shell script "ruby -ruri -e 'puts URI.escape(\"" & theContent & "\", /([^0-9A-Za-z-._~])/n)'"
-						
-						set theLink to theProtocol & escScheme & escID & "/" & escSubject & "/" & escContent & ":" & escApp
 					end tell
+					set escID to encodeURIComponent(theID)
+					set escSubject to encodeURIComponent(thesubject)
+					set escScheme to encodeURIComponent(theScheme)
+					set escContent to encodeURIComponent(theContent)
+					
+					set theLink to theProtocol & escScheme & escID & "/" & escSubject & "/" & escContent & ":" & escApp
 					
 					
 				else
@@ -142,13 +142,12 @@ on getItemMetadata(theProtocol, theApp)
 							set theItem to selection as alias
 							set thePath to POSIX path of theItem
 							set theTitle to (name of (get info for theItem)) & ":" & theApp
-							
-							set escScheme to do shell script "ruby -ruri -e 'puts URI.escape(\"" & theScheme & "\", /([^0-9A-Za-z-._~])/n)'"
-							set escPath to do shell script "ruby -ruri -e 'puts URI.escape(\"" & thePath & "\", /([^0-9A-Za-z-._~])/n)'"
-							set escTitle to do shell script "ruby -ruri -e 'puts URI.escape(\"" & theTitle & "\", /([^0-9A-Za-z-._~])/n)'"
-							
-							set theLink to theProtocol & escScheme & escPath & "/" & escTitle & "/" & ":" & escApp
 						end tell
+						set escScheme to encodeURIComponent(theScheme)
+						set escPath to encodeURIComponent(thePath)
+						set escTitle to encodeURIComponent(theTitle)
+						
+						set theLink to theProtocol & escScheme & escPath & "/" & escTitle & "/" & ":" & escApp
 						
 					else
 						
@@ -158,44 +157,50 @@ on getItemMetadata(theProtocol, theApp)
 									set theContent to contents of selected tab
 								end tell
 								set theScheme to "file:/"
-								set escScheme to do shell script "ruby -ruri -e 'puts URI.escape(\"" & theScheme & "\", /([^0-9A-Za-z-._~])/n)'"
+								set escScheme to encodeURIComponent(theScheme)
 								set theName to (name of front window) & ":" & theApp
-								set escName to do shell script "ruby -ruri -e 'puts URI.escape(\"" & theName & "\", /([^0-9A-Za-z-._~])/n)'"
-								set escContent to do shell script "ruby -ruri -e 'puts URI.escape(\"" & theContent & "\", /([^0-9A-Za-z-._~])/n)'"
-								
-								set theLink to theProtocol & escScheme & escErrorURL & "/" & escName & "/" & escContent & ":" & escApp
 							end tell
+							set escName to encodeURIComponent(theName)
+							set escContent to encodeURIComponent(theContent)
+							
+							set theLink to theProtocol & escScheme & escErrorURL & "/" & escName & "/" & escContent & ":" & escApp
 							
 						else
 							
 							if (theApp as string) = "firefox-bin" then
 								tell application "Firefox"
 									set theURL to «class curl» of window 1
-									set escURL to do shell script "ruby -ruri -e 'puts URI.escape(\"" & theURL & "\", /([^0-9A-Za-z-._~])/n)'"
-									set theLink to theProtocol & escURL & "/" & escURL & ":" & escApp
 								end tell
+								set escURL to encodeURIComponent(theURL)
+								set theLink to theProtocol & escURL & "/" & escURL & ":" & escApp
 								
 								
 							else
 								
 								tell application (theApp as string)
 									set theScheme to "file:/"
-									set escScheme to do shell script "ruby -ruri -e 'puts URI.escape(\"" & theScheme & "\", /([^0-9A-Za-z-._~])/n)'"
 									set appUnsupported to false
 									try
 										set theDoc to front document
 									on error
-										set theLink to theProtocol & escScheme & escErrorURL & "/" & escErrorMessage & ":" & escApp
 										set appUnsupported to true
 									end try
 									if appUnsupported is false then
 										set theTitle to (name of theDoc) & ":" & theApp
 										set thePath to path of theDoc
-										set escPath to do shell script "ruby -ruri -e 'puts URI.escape(\"" & thePath & "\", /([^0-9A-Za-z-._~])/n)'"
-										set escTitle to do shell script "ruby -ruri -e 'puts URI.escape(\"" & theTitle & "\", /([^0-9A-Za-z-._~])/n)'"
-										set theLink to theProtocol & escScheme & escPath & "/" & escTitle & ":" & escApp
+										
 									end if
 								end tell
+								
+								set escScheme to encodeURIComponent(theScheme)
+								if appUnsupported is true then
+									set theLink to theProtocol & escScheme & escErrorURL & "/" & escErrorMessage & ":" & escApp
+								else
+									set escPath to encodeURIComponent(thePath)
+									set escTitle to encodeURIComponent(theTitle)
+									set theLink to theProtocol & escScheme & escPath & "/" & escTitle & ":" & escApp
+								end if
+								
 								
 							end if
 						end if
