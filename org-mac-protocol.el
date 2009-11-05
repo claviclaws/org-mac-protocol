@@ -50,6 +50,75 @@
 ;; http://metajack.im/2008/12/30/gtd-capture-with-emacs-orgmode/
 
 (require 'org-protocol)
+(require 'org-bibtex)
+
+;; Define hyperlink types
+
+;; BibDesk
+
+(org-add-link-type "bibdesk" 'org-mac-bibdesk-open)
+
+(defun org-mac-bibdesk-open (uri)
+  "Visit the bibtex entry on URI in BibDesk"
+  (let* ((key (when (string-match "::\\(.+\\)\\'" uri)
+		(match-string 1 uri)))
+	 (document (substring uri 0 (match-beginning 0))))    
+    (do-applescript
+     (concat
+      "tell application \"BibDesk.app\"\n"
+         "activate\n"
+         "set theDoc to \"" document "\"\n"
+         "set theKey to \"" key "\"\n"
+         "open theDoc\n"
+         "tell document 1 of application \"BibDesk\"\n"
+            "set somePubs to (publications whose cite key contains theKey)\n"
+            "set the selection to somePubs\n"
+            "set theSelection to the selection\n"
+            "set thePub to get item 1 of theSelection\n"
+            "show thePub\n"
+         "end tell\n"
+      "end tell"))))
+
+;; Skim
+
+(org-add-link-type "skim" 'org-mac-skim-open)
+
+(defun org-mac-skim-open (uri)
+  "Visit the linked page of the pdf in Skim"
+  (let* ((page (when (string-match "::\\(.+\\)\\'" uri)
+		 (match-string 1 uri)))
+	 (document (substring uri 0 (match-beginning 0))))
+    (do-applescript
+     (concat
+      "tell application \"Skim\"\n"
+         "activate\n"
+	 "set theDoc to \"" document "\"\n"
+	 "set thePage to " page "\n"
+	 "open theDoc\n"
+	 "go document 1 to page thePage of document 1\n"
+      "end tell"))))
+
+
+;; iTunes
+
+(org-add-link-type "iTunes" 'org-mac-iTunes-open)
+
+(defun org-mac-iTunes-open (uri)
+  "Visit the linked track in iTunes"
+  (let* ((track (when (string-match "[0-9a-zA-Z]+\\'" uri)
+		  (match-string 0 uri))))
+    (do-applescript
+     (concat
+      "tell application \"iTunes\"\n"
+         "activate\n"
+	 "set theTrack to \"" track "\"\n"
+	 "set view of front browser window to user playlist \"Music\" of source \"Library\"\n"
+	 "play (some track of playlist \"Music\" of source \"Library\" whose persistent ID is theTrack)\n"
+	 "playpause\n"
+      "end tell"
+	 ))))
+
+;; Define org-protocol protocols
 
 (add-to-list 'org-protocol-protocol-alist
 	     '("org-mac-remember"

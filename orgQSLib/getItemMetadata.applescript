@@ -34,7 +34,7 @@ Please see org-mac-protocol.org for full installation and usage instructions
 *)
 
 on encodeURIComponent(theURI)
-	set escURI to do shell script "ruby -ruri -e 'puts URI.escape(\"" & theURI & "\", /([^0-9A-Za-z-._~])/n)'"
+	set escURI to do shell script "ruby -ruri -e \"puts URI.escape(\\\"" & theURI & "\\\", /([^0-9A-Za-z-._~])/n)\""
 end encodeURIComponent
 
 
@@ -63,19 +63,20 @@ on getItemMetadata(theProtocol, theApp)
 		if (theApp as string) = "Skim" then
 			tell application "Skim"
 				
-				set theScheme to "file:/"
+				set theScheme to "skim:"
 				set theDoc to front document
 				set theTitle to (name of theDoc) & ":" & theApp
-				set thePath to path of theDoc
+				set thePath to (path of theDoc) & "::"
 				set theSelection to selection of theDoc
 				set theContent to contents of (get text for theSelection)
+				set thePage to (get index for current page of theDoc)
 			end tell
 			set escScheme to encodeURIComponent(theScheme)
 			set escTitle to encodeURIComponent(theTitle)
 			set escPath to encodeURIComponent(thePath)
 			set escContent to encodeURIComponent(theContent)
 			
-			set theLink to theProtocol & escScheme & escPath & "/" & escTitle & "/" & escContent & ":" & escApp
+			set theLink to theProtocol & escScheme & escPath & thePage & "/" & escTitle & "/" & escContent & ":" & escApp
 			
 		else
 			
@@ -136,72 +137,101 @@ on getItemMetadata(theProtocol, theApp)
 					
 				else
 					
-					if (theApp as string) = "Finder" then
-						tell application "Finder"
-							set theScheme to "file:/"
-							set theItem to selection as alias
-							set thePath to POSIX path of theItem
-							set theTitle to (name of (get info for theItem)) & ":" & theApp
+					if (theApp as string) = "iTunes" then
+						tell application "iTunes"
+							set theScheme to "iTunes:"
+							set theID to (persistent ID of (item 1 of selection))
+							set theName to (name of (item 1 of selection)) & ":" & theApp
+							set theTitle to (name of (item 1 of selection))
+							set theComposer to (composer of (item 1 of selection))
+							set theAlbum to (album of (item 1 of selection))
+							set theArtist to (artist of (item 1 of selection))
+							set theContent to "
+" & theTitle & "
+" & theAlbum & "
+" & theComposer & "
+" & theArtist
 						end tell
 						set escScheme to encodeURIComponent(theScheme)
-						set escPath to encodeURIComponent(thePath)
+						set escName to encodeURIComponent(theName)
 						set escTitle to encodeURIComponent(theTitle)
+						set escComposer to encodeURIComponent(theComposer)
+						set escAlbum to encodeURIComponent(theAlbum)
+						set escArtist to encodeURIComponent(theArtist)
+						set escContent to encodeURIComponent(theContent)
 						
-						set theLink to theProtocol & escScheme & escPath & "/" & escTitle & "/" & ":" & escApp
+						
+						set theLink to theProtocol & escScheme & theID & "/" & escName & "/" & escContent & ":" & escApp
 						
 					else
 						
-						if (theApp as string) = "Terminal" then
-							tell application "Terminal"
-								tell front window
-									set theContent to contents of selected tab
-								end tell
+						
+						if (theApp as string) = "Finder" then
+							tell application "Finder"
 								set theScheme to "file:/"
-								set escScheme to encodeURIComponent(theScheme)
-								set theName to (name of front window) & ":" & theApp
+								set theItem to selection as alias
+								set thePath to POSIX path of theItem
+								set theTitle to (name of (get info for theItem)) & ":" & theApp
 							end tell
-							set escName to encodeURIComponent(theName)
-							set escContent to encodeURIComponent(theContent)
+							set escScheme to encodeURIComponent(theScheme)
+							set escPath to encodeURIComponent(thePath)
+							set escTitle to encodeURIComponent(theTitle)
 							
-							set theLink to theProtocol & escScheme & escErrorURL & "/" & escName & "/" & escContent & ":" & escApp
+							set theLink to theProtocol & escScheme & escPath & "/" & escTitle & "/" & ":" & escApp
 							
 						else
 							
-							if (theApp as string) = "firefox-bin" then
-								tell application "Firefox"
-									set theURL to «class curl» of window 1
+							if (theApp as string) = "Terminal" then
+								tell application "Terminal"
+									tell front window
+										set theContent to contents of selected tab
+									end tell
+									set theScheme to "file:/"
+									set escScheme to encodeURIComponent(theScheme)
+									set theName to (name of front window) & ":" & theApp
 								end tell
-								set escURL to encodeURIComponent(theURL)
-								set theLink to theProtocol & escURL & "/" & escURL & ":" & escApp
+								set escName to encodeURIComponent(theName)
+								set escContent to encodeURIComponent(theContent)
 								
+								set theLink to theProtocol & escScheme & escErrorURL & "/" & escName & "/" & escContent & ":" & escApp
 								
 							else
 								
-								tell application (theApp as string)
-									set theScheme to "file:/"
-									set appUnsupported to false
-									try
-										set theDoc to front document
-									on error
-										set appUnsupported to true
-									end try
-									if appUnsupported is false then
-										set theTitle to (name of theDoc) & ":" & theApp
-										set thePath to path of theDoc
-										
-									end if
-								end tell
-								
-								set escScheme to encodeURIComponent(theScheme)
-								if appUnsupported is true then
-									set theLink to theProtocol & escScheme & escErrorURL & "/" & escErrorMessage & ":" & escApp
+								if (theApp as string) = "firefox-bin" then
+									tell application "Firefox"
+										set theURL to «class curl» of window 1
+									end tell
+									set escURL to encodeURIComponent(theURL)
+									set theLink to theProtocol & escURL & "/" & escURL & ":" & escApp
+									
+									
 								else
-									set escPath to encodeURIComponent(thePath)
-									set escTitle to encodeURIComponent(theTitle)
-									set theLink to theProtocol & escScheme & escPath & "/" & escTitle & ":" & escApp
+									
+									tell application (theApp as string)
+										set theScheme to "file:/"
+										set appUnsupported to false
+										try
+											set theDoc to front document
+										on error
+											set appUnsupported to true
+										end try
+										if appUnsupported is false then
+											set theTitle to (name of theDoc) & ":" & theApp
+											set thePath to path of theDoc
+											
+										end if
+									end tell
+									
+									set escScheme to encodeURIComponent(theScheme)
+									if appUnsupported is true then
+										set theLink to theProtocol & escScheme & escErrorURL & "/" & escErrorMessage & ":" & escApp
+									else
+										set escPath to encodeURIComponent(thePath)
+										set escTitle to encodeURIComponent(theTitle)
+										set theLink to theProtocol & escScheme & escPath & "/" & escTitle & ":" & escApp
+									end if
+									
 								end if
-								
-								
 							end if
 						end if
 					end if

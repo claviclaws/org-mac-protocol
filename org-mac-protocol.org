@@ -42,14 +42,14 @@
 
 ** Requirements
 
-   - OS X 10.5 (untested on previous versions)
+   - OS X 10.5 or above (untested on previous versions)
 
    - [[http://orgmode.org][Org-Mode]] 6.28 or above (untested on previous versions)
    - [[https://gna.org/p/remember-el][Remember]]
 
 ** Installation and configuration
 *** Install files
-**** =org-mac-protocol.pkg= - OS X 10.5 only 
+**** =org-mac-protocol.pkg= - OS X 10.5 and 10.6 
 
     - Launch the installer and follow on screen instructions.  You
       must set a location for org-mac-protocol.el that is on your
