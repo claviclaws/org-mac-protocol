@@ -137,10 +137,12 @@ after the remember buffer is killed")
   "For some reason, (x-display-pixel-width) returns corrupted
 values when called during (org-mac-protocol-remember); this
 ensures that correct value is returned")
+(setq width-of-display (x-display-pixel-width))
 (defvar height-of-display (x-display-pixel-height)
   "For some reason, (x-display-pixel-height) returns corrupted
 values when called during (org-mac-protocol-remember); this
 ensures that correct value is returned")
+(setq height-of-display (x-display-pixel-height))
 
 (defadvice remember-finalize (after delete-remember-frame activate)  
   "Advise remember-finalize to close the frame if it is the mac-remember frame"  
