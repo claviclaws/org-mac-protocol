@@ -20,7 +20,7 @@ along with GNU Emacs; see the file COPYING.  If not, write to the
 Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
 Boston, MA 02110-1301, USA.
 
-Vesion: 0.628
+Vesion: 0.630
 
 Commentary
 
@@ -41,6 +41,8 @@ set AppleScript's text item delimiters to ASTID
 
 set getEmacsLib to (load script file ((orgQSLib as text) & "getEmacsClient.scpt"))
 set getItemMetaLib to (load script file ((orgQSLib as text) & "getItemMetadata.scpt"))
+global escapeLib
+set escapeLib to ((orgQSLib as text) & "escape.rb")
 set theProtocol to "org-protocol:/store-link:/"
 
 tell application "System Events"

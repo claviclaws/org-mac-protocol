@@ -124,6 +124,10 @@
 	     '("org-mac-remember"
 	       :protocol "mac-remember"
 	       :function org-mac-protocol-remember
+	       :kill-client t)
+	     '("org-mac-safari-tabs"
+	       :protocol "safari-tabs"
+	       :function org-mac-safari-tabs
 	       :kill-client t))
 
 (defvar org-mac-protocol-app nil
@@ -215,6 +219,13 @@ buffer is filed)"
 	  (frame-list))
     (select-frame-by-name "*mac-remember*")
     (org-protocol-remember info))
+  nil)
+
+(defun org-mac-safari-tabs (data)
+  "Process an org-protocol://safari-tabs:// scheme URL.
+Inserts a formatted list of hyperlinks to the tabs open in the
+front Safari window"  
+  (message data)
   nil)
 
 (provide 'org-mac-protocol)
