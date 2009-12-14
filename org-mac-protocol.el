@@ -98,6 +98,25 @@
 	 "go document 1 to page thePage of document 1\n"
       "end tell"))))
 
+;; Pages
+
+(org-add-link-type "pages" 'org-mac-pages-open)
+
+(defun org-mac-pages-open (uri)
+  "Visit the linked page of a document in Pages"
+  (let* ((charoff (when (string-match "::\\(.+\\)\\'" uri)
+		 (match-string 1 uri)))
+	 (document (substring uri 0 (match-beginning 0))))
+    (do-applescript
+     (concat
+      "tell application \"Pages\"\n"
+         "activate\n"
+	 "set theDoc to \"" document "\"\n"
+	 "set theCharOff to " charoff "\n"
+	 "open theDoc\n"
+	 "select character theCharOff of document 1\n"
+      "end tell"))))
+
 
 ;; iTunes
 
