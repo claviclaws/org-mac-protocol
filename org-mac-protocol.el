@@ -118,6 +118,37 @@
       "end tell"))))
 
 
+;; Numbers
+
+(org-add-link-type "numbers" 'org-mac-numbers-open)
+
+(defun org-mac-numbers-open (uri)
+  "Visit the linked spreadsheet in Numbers"
+  (let* ((sheet (when (string-match "::\\(.+\\)::\\(.+\\)::\\(.+\\)\\'" uri)
+		  (match-string 1 uri)))
+	 (table (when (string-match "::\\(.+\\)::\\(.+\\)::\\(.+\\)\\'" uri)
+		  (org-protocol-unhex-string (match-string 2 uri))))
+	 (range (when (string-match "::\\(.+\\)::\\(.+\\)::\\(.+\\)\\'" uri)
+		  (match-string 3 uri)))
+	 (document (substring uri 0 (match-beginning 0))))
+    (do-applescript
+     (concat
+      "tell application \"Numbers\"\n"
+         "activate\n"
+	 "set theDoc to \"" document "\"\n"
+	 "set theSheet to \"" sheet "\"\n"
+	 "set theTable to \"" table "\"\n"
+	 "set theRange to \"" range "\"\n"
+	 "open theDoc\n"
+	 "tell document 1\n"
+	    "tell sheet (theSheet as integer)\n"
+	       "tell table theTable\n"
+	          "set selection range to range theRange\n"
+	       "end tell\n"
+	    "end tell\n"
+	 "end tell\n"   
+       "end tell"))))
+
 ;; iTunes
 
 (org-add-link-type "iTunes" 'org-mac-iTunes-open)

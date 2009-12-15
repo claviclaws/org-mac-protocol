@@ -154,122 +154,174 @@ on getItemMetadata(theProtocol, theApp)
 						
 					else
 						
-						if (theApp as string) = "Mail" then
-							tell application "Mail"
-								
-								set theSelection to selection
-								repeat with theMessage in theSelection
-									set theID to message id of theMessage
-									set thesubject to (subject of theMessage) & ":" & theApp
-									set theContent to content of theMessage
-								end repeat
-								
-								set theScheme to "message://"
+						if (theApp as string) = "Numbers" then
+							tell application "Numbers"
+								set theScheme to "numbers:"
+								set theDoc to front document
+								set theTitle to (name of theDoc) & ":" & theApp
+								set thePath to (path of theDoc) & "::"
+								tell theDoc
+									set theSheet to 0
+									repeat with i from 1 to the count of sheets
+										tell sheet i
+											set x to the count of (tables whose selection range is not missing value)
+										end tell
+										if x is not 0 then
+											set theSheet to i
+											exit repeat
+										end if
+									end repeat
+									if theSheet is 0 then
+										set theSheet to 1 & "::"
+										set theTable to 1 & "::"
+										set theRange to "A1:A1"
+										set theContent to ""
+									else
+										tell sheet theSheet
+											set theTable to first table whose selection range is not missing value
+											tell theTable
+												set theSheet to (theSheet as text) & "::"
+												set theTable to (name of theTable) & "::"
+												set theRange to (name of selection range)
+												set theRangeValues to value of every cell of selection range
+												set AppleScript's text item delimiters to " "
+												set theContent to theRangeValues as string
+												set AppleScript's text item delimiters to ""
+											end tell
+										end tell
+									end if
+								end tell
 							end tell
-							set escID to encodeURIComponent(theID)
-							set escSubject to encodeURIComponent(thesubject)
+							
 							set escScheme to encodeURIComponent(theScheme)
+							set escTitle to encodeURIComponent(theTitle)
+							set escPath to encodeURIComponent(thePath)
+							set escSheet to encodeURIComponent(theSheet)
+							set escTable to encodeURIComponent(theTable)
+							set escRange to encodeURIComponent(theRange)
 							set escContent to encodeURIComponent(theContent)
 							
-							set theLink to theProtocol & escScheme & escID & "/" & escSubject & "/" & escContent & ":" & escApp
-							
+							set theLink to theProtocol & escScheme & escPath & escSheet & escTable & escRange & "/" & escTitle & "/" & escContent & ":" & escApp
 							
 						else
 							
-							if (theApp as string) = "iTunes" then
-								tell application "iTunes"
-									set theScheme to "iTunes:"
-									set theID to (persistent ID of (item 1 of selection))
-									set theName to (name of (item 1 of selection)) & ":" & theApp
-									set theTitle to (name of (item 1 of selection))
-									set theComposer to (composer of (item 1 of selection))
-									set theAlbum to (album of (item 1 of selection))
-									set theArtist to (artist of (item 1 of selection))
-									set theContent to "
+							if (theApp as string) = "Mail" then
+								tell application "Mail"
+									
+									set theSelection to selection
+									repeat with theMessage in theSelection
+										set theID to message id of theMessage
+										set thesubject to (subject of theMessage) & ":" & theApp
+										set theContent to content of theMessage
+									end repeat
+									
+									set theScheme to "message://"
+								end tell
+								set escID to encodeURIComponent(theID)
+								set escSubject to encodeURIComponent(thesubject)
+								set escScheme to encodeURIComponent(theScheme)
+								set escContent to encodeURIComponent(theContent)
+								
+								set theLink to theProtocol & escScheme & escID & "/" & escSubject & "/" & escContent & ":" & escApp
+								
+								
+							else
+								
+								if (theApp as string) = "iTunes" then
+									tell application "iTunes"
+										set theScheme to "iTunes:"
+										set theID to (persistent ID of (item 1 of selection))
+										set theName to (name of (item 1 of selection)) & ":" & theApp
+										set theTitle to (name of (item 1 of selection))
+										set theComposer to (composer of (item 1 of selection))
+										set theAlbum to (album of (item 1 of selection))
+										set theArtist to (artist of (item 1 of selection))
+										set theContent to "
 " & theTitle & "
 " & theAlbum & "
 " & theComposer & "
 " & theArtist
-								end tell
-								set escScheme to encodeURIComponent(theScheme)
-								set escName to encodeURIComponent(theName)
-								set escTitle to encodeURIComponent(theTitle)
-								set escComposer to encodeURIComponent(theComposer)
-								set escAlbum to encodeURIComponent(theAlbum)
-								set escArtist to encodeURIComponent(theArtist)
-								set escContent to encodeURIComponent(theContent)
-								
-								
-								set theLink to theProtocol & escScheme & theID & "/" & escName & "/" & escContent & ":" & escApp
-								
-							else
-								
-								
-								if (theApp as string) = "Finder" then
-									tell application "Finder"
-										set theScheme to "file:/"
-										set theItem to selection as alias
-										set thePath to POSIX path of theItem
-										set theTitle to (name of (get info for theItem)) & ":" & theApp
 									end tell
 									set escScheme to encodeURIComponent(theScheme)
-									set escPath to encodeURIComponent(thePath)
+									set escName to encodeURIComponent(theName)
 									set escTitle to encodeURIComponent(theTitle)
+									set escComposer to encodeURIComponent(theComposer)
+									set escAlbum to encodeURIComponent(theAlbum)
+									set escArtist to encodeURIComponent(theArtist)
+									set escContent to encodeURIComponent(theContent)
 									
-									set theLink to theProtocol & escScheme & escPath & "/" & escTitle & "/" & ":" & escApp
+									
+									set theLink to theProtocol & escScheme & theID & "/" & escName & "/" & escContent & ":" & escApp
 									
 								else
 									
-									if (theApp as string) = "Terminal" then
-										tell application "Terminal"
-											tell front window
-												set theContent to contents of selected tab
-											end tell
+									
+									if (theApp as string) = "Finder" then
+										tell application "Finder"
 											set theScheme to "file:/"
-											set escScheme to encodeURIComponent(theScheme)
-											set theName to (name of front window) & ":" & theApp
+											set theItem to selection as alias
+											set thePath to POSIX path of theItem
+											set theTitle to (name of (get info for theItem)) & ":" & theApp
 										end tell
-										set escName to encodeURIComponent(theName)
-										set escContent to encodeURIComponent(theContent)
+										set escScheme to encodeURIComponent(theScheme)
+										set escPath to encodeURIComponent(thePath)
+										set escTitle to encodeURIComponent(theTitle)
 										
-										set theLink to theProtocol & escScheme & escErrorURL & "/" & escName & "/" & escContent & ":" & escApp
+										set theLink to theProtocol & escScheme & escPath & "/" & escTitle & "/" & ":" & escApp
 										
 									else
 										
-										if (theApp as string) = "firefox-bin" then
-											tell application "Firefox"
-												set theURL to «class curl» of window 1
+										if (theApp as string) = "Terminal" then
+											tell application "Terminal"
+												tell front window
+													set theContent to contents of selected tab
+												end tell
+												set theScheme to "file:/"
+												set escScheme to encodeURIComponent(theScheme)
+												set theName to (name of front window) & ":" & theApp
 											end tell
-											set escURL to encodeURIComponent(theURL)
-											set theLink to theProtocol & escURL & "/" & escURL & ":" & escApp
+											set escName to encodeURIComponent(theName)
+											set escContent to encodeURIComponent(theContent)
 											
+											set theLink to theProtocol & escScheme & escErrorURL & "/" & escName & "/" & escContent & ":" & escApp
 											
 										else
 											
-											tell application (theApp as string)
-												set theScheme to "file:/"
-												set appUnsupported to false
-												try
-													set theDoc to front document
-												on error
-													set appUnsupported to true
-												end try
-												if appUnsupported is false then
-													set theTitle to (name of theDoc) & ":" & theApp
-													set thePath to path of theDoc
-													
-												end if
-											end tell
-											
-											set escScheme to encodeURIComponent(theScheme)
-											if appUnsupported is true then
-												set theLink to theProtocol & escScheme & escErrorURL & "/" & escErrorMessage & ":" & escApp
+											if (theApp as string) = "firefox-bin" then
+												tell application "Firefox"
+													set theURL to «class curl» of window 1
+												end tell
+												set escURL to encodeURIComponent(theURL)
+												set theLink to theProtocol & escURL & "/" & escURL & ":" & escApp
+												
+												
 											else
-												set escPath to encodeURIComponent(thePath)
-												set escTitle to encodeURIComponent(theTitle)
-												set theLink to theProtocol & escScheme & escPath & "/" & escTitle & ":" & escApp
+												
+												tell application (theApp as string)
+													set theScheme to "file:/"
+													set appUnsupported to false
+													try
+														set theDoc to front document
+													on error
+														set appUnsupported to true
+													end try
+													if appUnsupported is false then
+														set theTitle to (name of theDoc) & ":" & theApp
+														set thePath to path of theDoc
+														
+													end if
+												end tell
+												
+												set escScheme to encodeURIComponent(theScheme)
+												if appUnsupported is true then
+													set theLink to theProtocol & escScheme & escErrorURL & "/" & escErrorMessage & ":" & escApp
+												else
+													set escPath to encodeURIComponent(thePath)
+													set escTitle to encodeURIComponent(theTitle)
+													set theLink to theProtocol & escScheme & escPath & "/" & escTitle & ":" & escApp
+												end if
+												
 											end if
-											
 										end if
 									end if
 								end if
