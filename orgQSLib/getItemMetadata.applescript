@@ -27,19 +27,23 @@ on getItemMetadata(theProtocol, theApp)
 						if (theApp as string) = "Numbers" then
 							linkNumbers(theProtocol, theApp)
 						else
-							if (theApp as string) = "Mail" then
-								linkMail(theProtocol, theApp)
+							if (theApp as string) = "Keynote" then
+								linkKeynote(theProtocol, theApp)
 							else
-								if (theApp as string) = "iTunes" then
-									linkITunes(theProtocol, theApp)
+								if (theApp as string) = "Mail" then
+									linkMail(theProtocol, theApp)
 								else
-									if (theApp as string) = "Terminal" then
-										linkTerminal(theProtocol, theApp)
+									if (theApp as string) = "iTunes" then
+										linkITunes(theProtocol, theApp)
 									else
-										if (theApp as string) = "Finder" then
-											linkFinder(theProtocol, theApp)
+										if (theApp as string) = "Terminal" then
+											linkTerminal(theProtocol, theApp)
 										else
-											linkApplication(theProtocol, theApp)
+											if (theApp as string) = "Finder" then
+												linkFinder(theProtocol, theApp)
+											else
+												linkApplication(theProtocol, theApp)
+											end if
 										end if
 									end if
 								end if
@@ -136,17 +140,37 @@ on linkBibDesk(theProtocol, theApp)
 		set thePath to (path of theDoc) & "::"
 		set theSelection to the selection of theDoc
 		set thePub to item 1 of theSelection
-		set theContent to templated text of theDoc using text templateText for thePub
+		set theReference to templated text of theDoc using text templateText for thePub
 		set theCite to cite key of thePub
 		set theRef to ":" & theApp
+		set theKeywords to keywords of thePub
 	end tell
 	
 	set escScheme to encodeURIComponent(theScheme)
 	set escTitle to encodeURIComponent(theTitle)
 	set escCite to encodeURIComponent(theCite)
 	set escPath to encodeURIComponent(thePath)
-	set escContent to encodeURIComponent(theContent)
+	set escReference to encodeURIComponent(theReference)
 	set escRef to encodeURIComponent(theRef)
+	
+	set theKeywordsSed to (do shell script "echo \"" & theKeywords & "\" | sed -e 's/[;,]//g'")
+	set ASTID to AppleScript's AppleScript's text item delimiters
+	set AppleScript's text item delimiters to " "
+	set theKeywordsList to every text item in theKeywordsSed
+	set AppleScript's AppleScript's text item delimiters to ASTID
+	
+	set theProperty to ":PROPERTIES:
+"
+	repeat with theKeyword in theKeywordsList
+		set theProperty to theProperty & " :BIBDESK:  " & theKeyword & "
+"
+	end repeat
+	set theProperty to theProperty & " :END:"
+	set theContent to theProperty & "
+
+ " & theReference
+	set escContent to encodeURIComponent(theContent)
+	
 	
 	set theLink to theProtocol & escScheme & escPath & escCite & "/" & escTitle & escCite & escRef & "/" & escContent & ":" & escApp
 end linkBibDesk
@@ -218,6 +242,11 @@ on linkNumbers(theProtocol, theApp)
 	
 	set theLink to theProtocol & escScheme & escPath & escSheet & escTable & escRange & "/" & escTitle & "/" & escContent & ":" & escApp
 end linkNumbers
+
+on linkKeynote(theProtocol, theApp)
+	tell application "Keynote"
+	end tell
+end linkKeynote
 
 on linkMail(theProtocol, theApp)
 	tell application "Mail"
