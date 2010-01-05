@@ -162,13 +162,13 @@ on linkBibDesk(theProtocol, theApp)
 	set theProperty to ":PROPERTIES:
 "
 	repeat with theKeyword in theKeywordsList
-		set theProperty to theProperty & " :BIBDESK:  " & theKeyword & "
+		set theProperty to theProperty & "  :BIBDESK:  " & theKeyword & "
 "
 	end repeat
-	set theProperty to theProperty & " :END:"
+	set theProperty to theProperty & "  :END:"
 	set theContent to theProperty & "
 
- " & theReference
+  " & theReference
 	set escContent to encodeURIComponent(theContent)
 	
 	
