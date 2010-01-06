@@ -154,18 +154,10 @@ on linkBibDesk(theProtocol, theApp)
 	set escRef to encodeURIComponent(theRef)
 	
 	set theKeywordsSed to (do shell script "echo \"" & theKeywords & "\" | sed -e 's/[;,]//g'")
-	set ASTID to AppleScript's AppleScript's text item delimiters
-	set AppleScript's text item delimiters to " "
-	set theKeywordsList to every text item in theKeywordsSed
-	set AppleScript's AppleScript's text item delimiters to ASTID
 	
 	set theProperty to ":PROPERTIES:
-"
-	repeat with theKeyword in theKeywordsList
-		set theProperty to theProperty & "  :BIBDESK:  " & theKeyword & "
-"
-	end repeat
-	set theProperty to theProperty & "  :END:"
+  :BIBDESK:  " & theKeywordsSed & "
+  :END:"
 	set theContent to theProperty & "
 
   " & theReference
