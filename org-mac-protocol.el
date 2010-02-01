@@ -246,9 +246,25 @@ Pops up a small Emacs frame containing a remember buffer. Calls
 org-protocol-remember. Destroys the frame after the remember
 buffer is filed)"
 
-  (let* ((parts (org-protocol-split-data data nil ":"))
-	 (info (car parts))
-	 (app (org-protocol-unhex-string (cadr parts))))
+;; we need three elements. app, link, and description for remember title
+
+  (let* ((elements (org-protocol-split-data data nil ":"))
+	 (info (car elements))
+	 (app (org-protocol-unhex-string (cadr elements)))
+	 (parts (org-protocol-split-data info t))
+	 (template (or (and (= 1 (length (car parts))) (pop parts))
+		       org-protocol-default-template-key))
+	 (url (org-protocol-sanitize-uri (car parts)))
+	 (type (if (string-match "^\\([a-z]+\\):" url)
+		   (match-string 1 url)))
+	 (title (or (cadr parts) ""))
+	 (shorttitle (or (caddr parts) ""))
+	 (region (or (cadddr parts) ""))
+	 (orglink (org-make-link-string
+		   url (if (string-match "[^[:space:]]" title) title url)))
+	 remember-annotation-functions)
+
+;; app is for Applescript to move window's focus
 
     (setq org-mac-protocol-app app)
 
@@ -270,7 +286,22 @@ buffer is filed)"
 		(set-frame-parameter nil 'left center-left))))
 	  (frame-list))
     (select-frame-by-name "*mac-remember*")
-    (org-protocol-remember info))
+
+;; now in the new frame we call the remember template etc. we rewrite [[file:~/Library/Application%20Support/Emacs/site-lisp/org-mode/org-protocol.el::defun%20org-protocol-remember][Function: org-protocol-remember]] to include a new org-store-link-props with just the title of the link
+    ;; (if (and (boundp 'org-stored-links)
+    ;; 	     (fboundp 'org-remember)))
+     
+    (setq org-stored-links
+	  (cons (list url title) org-stored-links))
+    (kill-new orglink)
+    (org-store-link-props :type type
+			  :link url
+			  :description title
+			  :shortdesc shorttitle
+			  :initial region)
+    (raise-frame)
+    (org-remember nil (string-to-char template)))
+  (message "Org-mode not loaded.")
   nil)
 
 (defun org-mac-safari-tabs (data)
