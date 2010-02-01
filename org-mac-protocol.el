@@ -265,7 +265,7 @@ buffer is filed)"
 	 remember-annotation-functions)
 
 ;; app is for Applescript to move window's focus
-
+    
     (setq org-mac-protocol-app app)
 
     (do-applescript
@@ -290,7 +290,7 @@ buffer is filed)"
 ;; now in the new frame we call the remember template etc. we rewrite [[file:~/Library/Application%20Support/Emacs/site-lisp/org-mode/org-protocol.el::defun%20org-protocol-remember][Function: org-protocol-remember]] to include a new org-store-link-props with just the title of the link
     ;; (if (and (boundp 'org-stored-links)
     ;; 	     (fboundp 'org-remember)))
-     
+    
     (setq org-stored-links
 	  (cons (list url title) org-stored-links))
     (kill-new orglink)
@@ -299,7 +299,6 @@ buffer is filed)"
 			  :description title
 			  :shortdesc shorttitle
 			  :initial region)
-    (raise-frame)
     (org-remember nil (string-to-char template)))
   (message "Org-mode not loaded.")
   nil)
