@@ -64,6 +64,18 @@ on encodeURIComponent(theURI)
 	set escURI to do shell script "ruby " & (POSIX path of escapeLib) & " " & quoted form of theURI
 end encodeURIComponent
 
+
+(*
+Format of links:
+
+org-protocol:/protocol:/key/URI/description/short description/content:application name
+
+theProtocol - org-protocol:/protocol:/key/
+theApp - application name
+
+short description - for remember templates; removes theApp and other contextual information from description
+*)
+
 on linkError(theProtocol, theApp)
 	set theErrorURL to POSIX path of (path to application theApp)
 	set theErrorMessage to theApp & ": no AppleScript support"
@@ -75,15 +87,17 @@ end linkError
 on linkSafari(theProtocol, theApp)
 	tell application "Safari"
 		set theURL to do JavaScript "document.URL" in document 1
-		set theTitle to (do JavaScript "document.title" in document 1) & ":" & theApp
+		set theShortTitle to (do JavaScript "document.title" in document 1)
+		set theTitle to theShortTitle & ":" & theApp
 		set theContent to do JavaScript "window.getSelection()" in document 1
 	end tell
 	
 	set escURL to encodeURIComponent(theURL)
+	set escShortTitle to encodeURIComponent(theShortTitle)
 	set escTitle to encodeURIComponent(theTitle)
 	set escContent to encodeURIComponent(theContent)
 	
-	set theLink to theProtocol & escURL & "/" & escTitle & "/" & escContent & ":" & escApp
+	set theLink to theProtocol & escURL & "/" & escTitle & "/" & escShortTitle & "/" & escContent & ":" & escApp
 end linkSafari
 
 on linkSafariTabs(theProtocol, theApp)
@@ -105,7 +119,8 @@ on linkSkim(theProtocol, theApp)
 	tell application "Skim"
 		set theScheme to "skim:"
 		set theDoc to front document
-		set theTitle to (name of theDoc) & ":" & theApp
+		set theShortTitle to (name of theDoc)
+		set theTitle to theShortTitle & ":" & theApp
 		set thePath to (path of theDoc) & "::"
 		set theSelection to selection of theDoc
 		set theContent to contents of (get text for theSelection)
@@ -113,11 +128,12 @@ on linkSkim(theProtocol, theApp)
 	end tell
 	
 	set escScheme to encodeURIComponent(theScheme)
+	set escShortTitle to encodeURIComponent(theShortTitle)
 	set escTitle to encodeURIComponent(theTitle)
 	set escPath to encodeURIComponent(thePath)
 	set escContent to encodeURIComponent(theContent)
 	
-	set theLink to theProtocol & escScheme & escPath & thePage & "/" & escTitle & "/" & escContent & ":" & escApp
+	set theLink to theProtocol & escScheme & escPath & thePage & "/" & escTitle & "/" & escShortTitle & "/" & escContent & ":" & escApp
 end linkSkim
 
 on linkBibDesk(theProtocol, theApp)
@@ -142,7 +158,7 @@ on linkBibDesk(theProtocol, theApp)
 		set thePub to item 1 of theSelection
 		set theReference to templated text of theDoc using text templateText for thePub
 		set theCite to cite key of thePub
-		set theRef to ":" & theApp
+		set theAppName to ":" & theApp
 		set theKeywords to keywords of thePub
 	end tell
 	
@@ -151,7 +167,7 @@ on linkBibDesk(theProtocol, theApp)
 	set escCite to encodeURIComponent(theCite)
 	set escPath to encodeURIComponent(thePath)
 	set escReference to encodeURIComponent(theReference)
-	set escRef to encodeURIComponent(theRef)
+	set escAppName to encodeURIComponent(theAppName)
 	
 	set theKeywordsSed to (do shell script "echo \"" & theKeywords & "\" | sed -e 's/[;,]//g'")
 	
@@ -164,32 +180,35 @@ on linkBibDesk(theProtocol, theApp)
 	set escContent to encodeURIComponent(theContent)
 	
 	
-	set theLink to theProtocol & escScheme & escPath & escCite & "/" & escTitle & escCite & escRef & "/" & escContent & ":" & escApp
+	set theLink to theProtocol & escScheme & escPath & escCite & "/" & escTitle & escCite & escAppName & "/" & escCite & "/" & escContent & ":" & escApp
 end linkBibDesk
 
 on linkPages(theProtocol, theApp)
 	tell application "Pages"
 		set theScheme to "pages:"
 		set theDoc to front document
-		set theTitle to (name of theDoc) & ":" & theApp
+		set theShortTitle to (name of theDoc)
+		set theTitle to theShortTitle & ":" & theApp
 		set thePath to (path of theDoc) & "::"
 		set theContent to the selection of theDoc
 		set theCharOff to character offset of theContent
 	end tell
 	
 	set escScheme to encodeURIComponent(theScheme)
+	set escShortTitle to encodeURIComponent(theShortTitle)
 	set escTitle to encodeURIComponent(theTitle)
 	set escPath to encodeURIComponent(thePath)
 	set escContent to encodeURIComponent(theContent as text)
 	
-	set theLink to theProtocol & escScheme & escPath & theCharOff & "/" & escTitle & "/" & escContent & ":" & escApp
+	set theLink to theProtocol & escScheme & escPath & theCharOff & "/" & escTitle & "/" & escShortTitle & "/" & escContent & ":" & escApp
 end linkPages
 
 on linkNumbers(theProtocol, theApp)
 	tell application "Numbers"
 		set theScheme to "numbers:"
 		set theDoc to front document
-		set theTitle to (name of theDoc) & ":" & theApp
+		set theShortTitle to (name of theDoc)
+		set theTitle to theShortTitle & ":" & theApp
 		set thePath to (path of theDoc) & "::"
 		tell theDoc
 			set theSheet to 0
@@ -225,6 +244,7 @@ on linkNumbers(theProtocol, theApp)
 	end tell
 	
 	set escScheme to encodeURIComponent(theScheme)
+	set escShortTitle to encodeURIComponent(theShortTitle)
 	set escTitle to encodeURIComponent(theTitle)
 	set escPath to encodeURIComponent(thePath)
 	set escSheet to encodeURIComponent(theSheet)
@@ -232,7 +252,7 @@ on linkNumbers(theProtocol, theApp)
 	set escRange to encodeURIComponent(theRange)
 	set escContent to encodeURIComponent(theContent)
 	
-	set theLink to theProtocol & escScheme & escPath & escSheet & escTable & escRange & "/" & escTitle & "/" & escContent & ":" & escApp
+	set theLink to theProtocol & escScheme & escPath & escSheet & escTable & escRange & "/" & escTitle & "/" & escShortTitle & "/" & escContent & ":" & escApp
 end linkNumbers
 
 on linkKeynote(theProtocol, theApp)
@@ -245,25 +265,28 @@ on linkMail(theProtocol, theApp)
 		set theSelection to selection
 		repeat with theMessage in theSelection
 			set theID to message id of theMessage
-			set thesubject to (subject of theMessage) & ":" & theApp
+			set theShortSubject to (subject of theMessage)
+			set theSubject to theShortSubject & ":" & theApp
 			set theContent to content of theMessage
 		end repeat
 		set theScheme to "message://"
 	end tell
 	
 	set escID to encodeURIComponent(theID)
-	set escSubject to encodeURIComponent(thesubject)
+	set escShortSubject to encodeURIComponent(theShortSubject)
+	set escSubject to encodeURIComponent(theSubject)
 	set escScheme to encodeURIComponent(theScheme)
 	set escContent to encodeURIComponent(theContent)
 	
-	set theLink to theProtocol & escScheme & escID & "/" & escSubject & "/" & escContent & ":" & escApp
+	set theLink to theProtocol & escScheme & escID & "/" & escSubject & "/" & escShortSubject & "/" & escContent & ":" & escApp
 end linkMail
 
 on linkITunes(theProtocol, theApp)
 	tell application "iTunes"
 		set theScheme to "iTunes:"
 		set theID to (persistent ID of (item 1 of selection))
-		set theName to (name of (item 1 of selection)) & ":" & theApp
+		set theShortName to (name of (item 1 of selection))
+		set theName to theShortName & ":" & theApp
 		set theTitle to (name of (item 1 of selection))
 		set theComposer to (composer of (item 1 of selection))
 		set theAlbum to (album of (item 1 of selection))
@@ -276,13 +299,14 @@ on linkITunes(theProtocol, theApp)
 	end tell
 	
 	set escScheme to encodeURIComponent(theScheme)
+	set escShortName to encodeURIComponent(theShortName)
 	set escName to encodeURIComponent(theName)
 	set escTitle to encodeURIComponent(theTitle)
 	set escComposer to encodeURIComponent(theComposer)
 	set escAlbum to encodeURIComponent(theAlbum)
 	set escArtist to encodeURIComponent(theArtist)
 	set escContent to encodeURIComponent(theContent)
-	set theLink to theProtocol & escScheme & theID & "/" & escName & "/" & escContent & ":" & escApp
+	set theLink to theProtocol & escScheme & theID & "/" & escName & "/" & escShortName & "/" & escContent & ":" & escApp
 end linkITunes
 
 on linkTerminal(theProtocol, theApp)
@@ -291,14 +315,16 @@ on linkTerminal(theProtocol, theApp)
 			set theContent to contents of selected tab
 		end tell
 		set theScheme to "file:/"
-		set escScheme to encodeURIComponent(theScheme)
-		set theName to (name of front window) & ":" & theApp
+		set theShortName to (name of front window)
+		set theName to theShortName & ":" & theApp
 	end tell
 	
+	set escScheme to encodeURIComponent(theScheme)
+	set escShortName to encodeURIComponent(theShortName)
 	set escName to encodeURIComponent(theName)
 	set escContent to encodeURIComponent(theContent)
 	
-	set theLink to theProtocol & escScheme & escErrorURL & "/" & escName & "/" & escContent & ":" & escApp
+	set theLink to theProtocol & escScheme & escErrorURL & "/" & escName & "/" & escShortName & "/" & escContent & ":" & escApp
 end linkTerminal
 
 on linkFinder(theProtocol, theApp)
@@ -306,14 +332,16 @@ on linkFinder(theProtocol, theApp)
 		set theScheme to "file:/"
 		set theItem to selection as alias
 		set thePath to POSIX path of theItem
-		set theTitle to (name of (get info for theItem)) & ":" & theApp
+		set theShortTitle to (name of (get info for theItem))
+		set theTitle to theShortTitle & ":" & theApp
 	end tell
 	
 	set escScheme to encodeURIComponent(theScheme)
 	set escPath to encodeURIComponent(thePath)
+	set escShortTitle to encodeURIComponent(theShortTitle)
 	set escTitle to encodeURIComponent(theTitle)
 	
-	set theLink to theProtocol & escScheme & escPath & "/" & escTitle & "/" & ":" & escApp
+	set theLink to theProtocol & escScheme & escPath & "/" & escTitle & "/" & escShortTitle & ":" & escApp
 end linkFinder
 
 on linkApplication(theProtocol, theApp)
@@ -326,7 +354,8 @@ on linkApplication(theProtocol, theApp)
 			set appUnsupported to true
 		end try
 		if appUnsupported is false then
-			set theTitle to (name of theDoc) & ":" & theApp
+			set theShortTitle to (name of theDoc)
+			set theTitle to theShortTitle & ":" & theApp
 			set thePath to path of theDoc
 			
 		end if
@@ -338,6 +367,6 @@ on linkApplication(theProtocol, theApp)
 	else
 		set escPath to encodeURIComponent(thePath)
 		set escTitle to encodeURIComponent(theTitle)
-		set theLink to theProtocol & escScheme & escPath & "/" & escTitle
+		set theLink to theProtocol & escScheme & escPath & "/" & escTitle & "/" & escShortTitle
 	end if
 end linkApplication
