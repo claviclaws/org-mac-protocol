@@ -366,6 +366,7 @@ on linkApplication(theProtocol, theApp)
 		set theLink to theProtocol & escScheme & escErrorURL & "/" & escErrorMessage & ":" & escApp
 	else
 		set escPath to encodeURIComponent(thePath)
+		set escShortTitle to encodeURIComponent(theShortTitle)
 		set escTitle to encodeURIComponent(theTitle)
 		set theLink to theProtocol & escScheme & escPath & "/" & escTitle & "/" & escShortTitle
 	end if
