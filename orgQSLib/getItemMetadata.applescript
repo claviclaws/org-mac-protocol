@@ -124,6 +124,9 @@ on linkSkim(theProtocol, theApp)
 		set thePath to (path of theDoc) & "::"
 		set theSelection to selection of theDoc
 		set theContent to contents of (get text for theSelection)
+		if theContent is missing value then
+			set theContent to ""
+		end if
 		set thePage to (get index for current page of theDoc)
 	end tell
 	
