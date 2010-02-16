@@ -174,7 +174,8 @@
 	     '("org-mac-remember"
 	       :protocol "mac-remember"
 	       :function org-mac-protocol-remember
-	       :kill-client t)
+	       :kill-client t))
+(add-to-list 'org-protocol-protocol-alist
 	     '("org-mac-safari-tabs"
 	       :protocol "safari-tabs"
 	       :function org-mac-safari-tabs
@@ -287,9 +288,11 @@ buffer is filed)"
 	  (frame-list))
     (select-frame-by-name "*mac-remember*")
 
-;; now in the new frame we call the remember template etc. we rewrite [[file:~/Library/Application%20Support/Emacs/site-lisp/org-mode/org-protocol.el::defun%20org-protocol-remember][Function: org-protocol-remember]] to include a new org-store-link-props with just the title of the link
-    ;; (if (and (boundp 'org-stored-links)
-    ;; 	     (fboundp 'org-remember)))
+    ;; now in the new frame we call the remember template etc. we rewrite
+    ;; [[file:~/Library/Application%20Support/Emacs/site-lisp/org-mode/org-protocol.el::defun%20org-protocol-remember][Function:
+    ;; org-protocol-remember]] to include a new org-store-link-props
+    ;; with just the title of the link (if (and (boundp
+    ;; 'org-stored-links) (fboundp 'org-remember)))
     
     (setq org-stored-links
 	  (cons (list url title) org-stored-links))
@@ -307,7 +310,10 @@ buffer is filed)"
   "Process an org-protocol://safari-tabs:// scheme URL.
 Inserts a formatted list of hyperlinks to the tabs open in the
 front Safari window"  
-  (message data)
+  (let* ((links (org-protocol-split-data data nil "::")))
+    (mapc (lambda (x)
+	    (org-protocol-store-link x))
+	  links))
   nil)
 
 (provide 'org-mac-protocol)

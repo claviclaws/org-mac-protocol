@@ -105,14 +105,25 @@ on linkSafariTabs(theProtocol, theApp)
 		set theTabs to tabs of window 1
 		set theLinkList to {}
 		repeat with eachTab in theTabs
-			set escURL to (do JavaScript "encodeURIComponent(document.URL)" in eachTab)
-			set escTitle to (do JavaScript "encodeURIComponent(document.title)" in eachTab)
+			set theURL to (do JavaScript "document.URL" in eachTab)
+			set theTitle to (do JavaScript "document.title" in eachTab)
+			set escURL to encodeURIComponent(theURL) of me
+			set escTitle to encodeURIComponent(theTitle) of me
+			
+			(*
+set escURL to (do JavaScript "encodeURIComponent(document.URL)" in eachTab)
+			set escTitle to (do JavaScript "encodeURIComponent(document.title)" in eachTab)		
+*)
+			
 			set eachLink to escURL & "/" & escTitle & "/" & "::"
 			copy eachLink to end of theLinkList
 		end repeat
 	end tell
 	
-	set theLink to theProtocol & (theLinkList as string)
+	(*
+	set escLinkList to encodeURIComponent((theLinkList as string))
+*)
+	set theLink to theProtocol & theLinkList
 end linkSafariTabs
 
 on linkSkim(theProtocol, theApp)
