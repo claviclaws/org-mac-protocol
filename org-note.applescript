@@ -1,7 +1,7 @@
 (*
 org-note.scpt --- make a note in an org-mode file without linking to front document
 
-Copyright (C) 2009 Christopher Suckling
+Copyright (C) 2009, 2010 Christopher Suckling
 
 Author: Christopher Suckling <suckling at gmail dot com>
 
@@ -20,7 +20,7 @@ along with GNU Emacs; see the file COPYING.  If not, write to the
 Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
 Boston, MA 02110-1301, USA.
 
-Vesion: 0.630
+Vesion: 0.634
 
 Commentary
 
@@ -28,7 +28,8 @@ Part of org-mac-protocol
 
 Installation
 
-1) Copy to ~/Library/Scripts/orgQSLib/
+1) Open in AppleScript Editor
+2) Save as File Format: Script in  ~/Library/Scripts/
 
 Please see org-mac-protocol.org for full installation and usage instructions
 *)
@@ -45,11 +46,9 @@ global escapeLib
 set escapeLib to ((orgQSLib as text) & "escape.rb")
 set theProtocol to "org-protocol:/mac-remember:/z/"
 
-
 tell application "System Events"
 	set theApp to item 1 of (get name of processes whose frontmost is true)
 end tell
-
 
 set theScript to getEmacsLib's getEmacsClient() & " " & getItemMetaLib's getItemMetadata(theProtocol, theApp)
 

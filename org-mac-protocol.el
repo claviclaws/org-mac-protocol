@@ -1,7 +1,7 @@
 ;;; org-mac-protocol.el -- process events triggered by the
 ;;; org-mac-protocol suite of AppleScripts
 
-;; Copyright (C) 2009 Christopher Suckling
+;; Copyright (C) 2009, 2010 Christopher Suckling
 
 ;; Author: Christopher Suckling <suckling at gmail dot com>
 
@@ -20,31 +20,22 @@
 ;; Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
 ;; Boston, MA 02110-1301, USA.
 
-;; Version: 0.628
+;; Version: 0.634
 ;; Keywords: outlines, hyperlinks, wp
 
 ;;; Commentary
 ;;
-;; This file provides an org-protocol handler and various hacks to
+;; This file provides org-protocol handlers and various hacks to
 ;; produce a nicely centered, pop-up remember frame for links passed
-;; to emacsclient by the org-mac-protocol suite of AppleScripts.
+;; to emacsclient by the org-mac-protocol suite of AppleScripts. It
+;; also defines new org-mode hyperlink types for opening files in
+;; various OS X applications.
+
+;;; Installation and Usage
 ;;
-;; Installation
-;;
-;; Move this file to your elisp load-path and add
-;; (require 'org-mac-protocol)
-;; to your .emacs
-;;
-;; Usage
-;;
-;; You must create two org-remember-templates. Please see the
-;; org-mac-protocol manual for sample templates. If you change the
-;; keys to trigger these templates, you *must* edit the relevant lines
-;; in org-remember.scpt and org-note.scpt. Please see the
-;; documentation to org-protocol.el and the org-mode manual for
-;; further assistance with creating templates.
-;;
-;; Credit
+;; Please see org-mac-protocol.org
+
+;;; Credit
 ;;
 ;; Portions of this code are developed from a blog post by Jack Moffitt:
 ;; http://metajack.im/2008/12/30/gtd-capture-with-emacs-orgmode/
@@ -52,14 +43,14 @@
 (require 'org-protocol)
 (require 'org-bibtex)
 
-;; Define hyperlink types
-
+;;; Define org-mode hyperlink types
+;;
 ;; BibDesk
 
 (org-add-link-type "bibdesk" 'org-mac-bibdesk-open)
 
 (defun org-mac-bibdesk-open (uri)
-  "Visit the bibtex entry on URI in BibDesk"
+  "Visit bibtex entry in BibDesk"
   (let* ((key (when (string-match "::\\(.+\\)\\'" uri)
 		(match-string 1 uri)))
 	 (document (substring uri 0 (match-beginning 0))))    
@@ -84,7 +75,7 @@
 (org-add-link-type "skim" 'org-mac-skim-open)
 
 (defun org-mac-skim-open (uri)
-  "Visit the linked page of the pdf in Skim"
+  "Visit page of pdf in Skim"
   (let* ((page (when (string-match "::\\(.+\\)\\'" uri)
 		 (match-string 1 uri)))
 	 (document (substring uri 0 (match-beginning 0))))
@@ -103,7 +94,9 @@
 (org-add-link-type "pages" 'org-mac-pages-open)
 
 (defun org-mac-pages-open (uri)
-  "Visit the linked page of a document in Pages"
+  "Visit page of document in Pages. Reliant on character offset
+from start of document, so link may degrade if document is
+edited"
   (let* ((charoff (when (string-match "::\\(.+\\)\\'" uri)
 		 (match-string 1 uri)))
 	 (document (substring uri 0 (match-beginning 0))))
@@ -117,13 +110,14 @@
 	 "select character theCharOff of document 1\n"
       "end tell"))))
 
-
 ;; Numbers
 
 (org-add-link-type "numbers" 'org-mac-numbers-open)
 
 (defun org-mac-numbers-open (uri)
-  "Visit the linked spreadsheet in Numbers"
+  "Visit range of spreadsheet in Numbers. Although the correct
+cells will be selected, it may be necessary to change sheets
+manually"
   (let* ((sheet (when (string-match "::\\(.+\\)::\\(.+\\)::\\(.+\\)\\'" uri)
 		  (match-string 1 uri)))
 	 (table (when (string-match "::\\(.+\\)::\\(.+\\)::\\(.+\\)\\'" uri)
@@ -149,12 +143,33 @@
 	 "end tell\n"   
        "end tell"))))
 
+
+;; Keynote
+
+(org-add-link-type "keynote" 'org-mac-keynote-open)
+
+(defun org-mac-keynote-open (uri)
+  "Visit slide in Keynote"
+  (let* ((slide (when (string-match "::\\(.+\\)\\'" uri)
+		  (match-string 1 uri)))
+	 (document (substring uri 0 (match-beginning 0))))
+    (do-applescript
+     (concat
+      "tell application \"Keynote\"\n"
+          "activate\n"
+          "set theDoc to \"" document "\"\n"
+          "set theSlide to " slide "\n"
+          "open theDoc\n"
+          "show slide theSlide of slideshow 1\n"
+      "end tell"))))
+
+
 ;; iTunes
 
 (org-add-link-type "iTunes" 'org-mac-iTunes-open)
 
 (defun org-mac-iTunes-open (uri)
-  "Visit the linked track in iTunes"
+  "Visit track in iTunes"
   (let* ((track (when (string-match "[0-9a-zA-Z]+\\'" uri)
 		  (match-string 0 uri))))
     (do-applescript
@@ -168,32 +183,24 @@
       "end tell"
 	 ))))
 
-;; Define org-protocol protocols
 
-(add-to-list 'org-protocol-protocol-alist
-	     '("org-mac-remember"
-	       :protocol "mac-remember"
-	       :function org-mac-protocol-remember
-	       :kill-client t))
-(add-to-list 'org-protocol-protocol-alist
-	     '("org-mac-safari-tabs"
-	       :protocol "safari-tabs"
-	       :function org-mac-safari-tabs
-	       :kill-client t))
+;;; Variables and advice for managing *remember* frames
 
-(defvar org-mac-protocol-app nil
-  "The application that AppleScript will acticate
-after the remember buffer is killed")
 (defvar width-of-display (x-display-pixel-width)
   "For some reason, (x-display-pixel-width) returns corrupted
 values when called during (org-mac-protocol-remember); this
 ensures that correct value is returned")
 (setq width-of-display (x-display-pixel-width))
+
 (defvar height-of-display (x-display-pixel-height)
   "For some reason, (x-display-pixel-height) returns corrupted
 values when called during (org-mac-protocol-remember); this
 ensures that correct value is returned")
 (setq height-of-display (x-display-pixel-height))
+
+(defvar org-mac-protocol-app nil
+  "The application that AppleScript will activate
+after the *remember* buffer is killed")
 
 (defadvice remember-finalize (after delete-remember-frame activate)  
   "Advise remember-finalize to close the frame if it is the mac-remember frame"  
@@ -241,13 +248,27 @@ the remember frame"
     (delete-other-windows)))
 
 
+;;; Define org-protocol protocols
+
+(add-to-list 'org-protocol-protocol-alist
+	     '("org-mac-remember"
+	       :protocol "mac-remember"
+	       :function org-mac-protocol-remember
+	       :kill-client t))
+
+(add-to-list 'org-protocol-protocol-alist
+	     '("org-mac-safari-tabs"
+	       :protocol "safari-tabs"
+	       :function org-mac-safari-tabs
+	       :kill-client t))
+
 (defun org-mac-protocol-remember (data)
   "Process an org-protocol://mac-remember:// scheme URL.
-Pops up a small Emacs frame containing a remember buffer. Calls
-org-protocol-remember. Destroys the frame after the remember
-buffer is filed)"
-
-;; we need three elements. app, link, and description for remember title
+Pop up a small, centred Emacs frame containing a remember
+buffer. Destroys the frame after the remember buffer is filed and
+return to originating application. This code is
+essentially (org-protocol-remember) with an additional :shortdesc
+link property"
 
   (let* ((elements (org-protocol-split-data data nil ":"))
 	 (info (car elements))
@@ -264,8 +285,6 @@ buffer is filed)"
 	 (orglink (org-make-link-string
 		   url (if (string-match "[^[:space:]]" title) title url)))
 	 remember-annotation-functions)
-
-;; app is for Applescript to move window's focus
     
     (setq org-mac-protocol-app app)
 
@@ -288,32 +307,28 @@ buffer is filed)"
 	  (frame-list))
     (select-frame-by-name "*mac-remember*")
 
-    ;; now in the new frame we call the remember template etc. we rewrite
-    ;; [[file:~/Library/Application%20Support/Emacs/site-lisp/org-mode/org-protocol.el::defun%20org-protocol-remember][Function:
-    ;; org-protocol-remember]] to include a new org-store-link-props
-    ;; with just the title of the link (if (and (boundp
-    ;; 'org-stored-links) (fboundp 'org-remember)))
-    
     (setq org-stored-links
 	  (cons (list url title) org-stored-links))
-    (kill-new orglink)
+    (kill-new orglink)    
     (org-store-link-props :type type
 			  :link url
 			  :description title
 			  :shortdesc shorttitle
 			  :initial region)
     (org-remember nil (string-to-char template)))
-  (message "Org-mode not loaded.")
   nil)
 
 (defun org-mac-safari-tabs (data)
   "Process an org-protocol://safari-tabs:// scheme URL.
 Inserts a formatted list of hyperlinks to the tabs open in the
 front Safari window"  
-  (let* ((links (org-protocol-split-data data nil "::")))
+  (let* ((elements (org-protocol-split-data data nil "::"))	 
+	 ;; discard the last element, as it is blank
+	 (links (butlast elements)))
     (mapc (lambda (x)
 	    (org-protocol-store-link x))
 	  links))
   nil)
+
 
 (provide 'org-mac-protocol)

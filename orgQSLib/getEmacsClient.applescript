@@ -20,7 +20,7 @@ along with GNU Emacs; see the file COPYING.  If not, write to the
 Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
 Boston, MA 02110-1301, USA.
 
-Vesion: 0.628
+Vesion: 0.634
 
 Commentary
 
@@ -28,12 +28,11 @@ Part of org-mac-protocol
 
 Installation
 
-1) Copy to ~/Library/Scripts/orgQSLib/
-
-2) Edit theEmacsClient to point to your Emacs installation
+1) Open in AppleScript Editor
+2) Save as File Format: Script in  ~/Library/Scripts/orgQSLib/
+3) Edit theEmacsClient to point to your emacsclient
 
 Please see org-mac-protocol.org for full installation and usage instructions
-
 *)
 
 on getEmacsClient()

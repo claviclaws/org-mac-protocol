@@ -1,7 +1,7 @@
 (*
 org-link.scpt --- extract an org-protocol link from the front document and pass it to emacsclient
 
-Copyright (C) 2009 Christopher Suckling
+Copyright (C) 2009, 2010 Christopher Suckling
 
 Author: Christopher Suckling <suckling at gmail dot com>
 
@@ -20,7 +20,7 @@ along with GNU Emacs; see the file COPYING.  If not, write to the
 Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
 Boston, MA 02110-1301, USA.
 
-Vesion: 0.630
+Vesion: 0.634
 
 Commentary
 
@@ -28,7 +28,8 @@ Part of org-mac-protocol
 
 Installation
 
-1) Copy to ~/Library/Scripts/
+1) Open in AppleScript Editor
+2) Save as File Format: Script in  ~/Library/Scripts/
 
 Please see org-mac-protocol.org for full installation and usage instructions
 *)

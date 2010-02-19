@@ -1,3 +1,39 @@
+(*
+getItemMetadata.scpt --- get data to be passed to org-protocol from front application
+
+Copyright (C) 2009, 2010 Christopher Suckling
+
+Author: Christopher Suckling <suckling at gmail dot com>
+
+This file is Free Software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 3, or (at your option)
+any later version.
+
+It is distributed in the hope that it will be useful, but WITHOUT
+ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public
+License for more details.
+
+You should have received a copy of the GNU General Public License
+along with GNU Emacs; see the file COPYING.  If not, write to the
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+Boston, MA 02110-1301, USA.
+
+Vesion: 0.634
+
+Commentary
+
+Part of org-mac-protocol
+
+Installation
+
+1) Open in AppleScript Editor
+2) Save as File Format: Script in  ~/Library/Scripts/orgQSLib/
+
+Please see org-mac-protocol.org for full installation and usage instructions
+*)
+
 global theLink
 global escErrorURL
 global escErrorMessage
@@ -109,20 +145,11 @@ on linkSafariTabs(theProtocol, theApp)
 			set theTitle to (do JavaScript "document.title" in eachTab)
 			set escURL to encodeURIComponent(theURL) of me
 			set escTitle to encodeURIComponent(theTitle) of me
-			
-			(*
-set escURL to (do JavaScript "encodeURIComponent(document.URL)" in eachTab)
-			set escTitle to (do JavaScript "encodeURIComponent(document.title)" in eachTab)		
-*)
-			
 			set eachLink to escURL & "/" & escTitle & "/" & "::"
 			copy eachLink to end of theLinkList
 		end repeat
 	end tell
 	
-	(*
-	set escLinkList to encodeURIComponent((theLinkList as string))
-*)
 	set theLink to theProtocol & theLinkList
 end linkSafariTabs
 
@@ -271,7 +298,26 @@ end linkNumbers
 
 on linkKeynote(theProtocol, theApp)
 	tell application "Keynote"
+		set theScheme to "keynote:"
+		set theDoc to front slideshow
+		set theShortTitle to (name of theDoc)
+		set theTitle to theShortTitle & ":Keynote"
+		set thePath to (path of theDoc) & "::"
+		set theSlide to (current slide of front slideshow)
+		set theSlideIndex to (slide number of theSlide)
+		set theContent to (title of theSlide) & "
+	
+	" & (body of theSlide)
 	end tell
+	
+	set escScheme to encodeURIComponent(theScheme)
+	set escPath to encodeURIComponent(thePath)
+	set escTitle to encodeURIComponent(theTitle)
+	set escShortTitle to encodeURIComponent(theShortTitle)
+	set escContent to encodeURIComponent(theContent)
+	
+	set theLink to theProtocol & escScheme & escPath & theSlideIndex & "/" & escTitle & "/" & escShortTitle & "/" & escContent & ":" & escApp
+	
 end linkKeynote
 
 on linkMail(theProtocol, theApp)
