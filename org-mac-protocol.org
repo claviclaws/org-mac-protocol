@@ -57,7 +57,8 @@
 *** Compile scripts
 
     - Open all =.applescript= files (4 in the repository home and 2 in
-      =/orgQSLib=) in [[file://Applications/Utilities/AppleScript%20Editor.app/][AppleScript Editor]] then =File - Save As... - File Format: Script=[fn:1]
+      =/orgQSLib=) in [[file://Applications/Utilities/AppleScript%20Editor.app/][AppleScript Editor]] then =File - Save As... -
+      File Format: Script= [fn:1]
 
     - /(Optional)/ Byte compile =org-mac-protocol.el=
 
@@ -75,13 +76,13 @@ changes with git; they must be compiled to run.
 	The folder structure should be:
 
 #+BEGIN_EXAMPLE
-	~/Library/Scripts/org-link.scpt
-	                  org-link-tabs.scpt
-			  org-remember.scpt
-			  org-note.scpt
-			  orgQSLib/escape.rb
-			           getEmacsClient.scpt
-				   getItemMetadata.scpt
+~/Library/Scripts/org-link.scpt
+                  org-link-tabs.scpt
+		  org-remember.scpt
+		  org-note.scpt
+		  orgQSLib/escape.rb
+		           getEmacsClient.scpt
+			   getItemMetadata.scpt
 #+END_EXAMPLE
 
 
@@ -153,8 +154,8 @@ changes with git; they must be compiled to run.
     | Mail     | Link: message      |               | Content: entire message                              |
     | Skim     | Link: page         |               | Content: current selection                           |
     | BibDesk  | Link: entry        |               | Content: Harvard style citation                      |
-    | Pages    | Link: page[fn:2]   |               | Content: current selection                           |
-    | Numbers  | Link: range[fn:3]  |               | Content: current selection                           |
+    | Pages    | Link: page [fn:2]  |               | Content: current selection                           |
+    | Numbers  | Link: range [fn:3] |               | Content: current selection                           |
     | Keynote  | Link: slide        |               | Content: slide title and body text                   |
     | iTunes   | Link: track        |               | Content: Title, Album, Composer, and Artist of track |
     | Finder   | Link: file         |               | Content: no                                          |
@@ -203,6 +204,27 @@ change sheet manually.
     - Enter note in pop-up =*Remember*= buffer
     - File note to return to previous application
        
+
+** Reference
+
+*** Structure of links
+    
+    org-mac-protocol handles the following link structure:
+
+    : org-protocol:/sub-protocol:/key/URI/description/short description/content:application name
+
+    =org-protocol:/sub-protocol:/key/= is formed by the variable
+    =theProtocol=
+
+    =application name= is formed by the variable =theApp=
+
+    =URI= is formed by =getItemMetadata=
+
+    =description= of the =URI= is formed by =getItemMetadata= and =theApp=
+
+    =short description= is a truncated version of =description=
+    removing the =theApp= from the description
+
 ** Acknowledgements
    
    The pop up remember buffer is developed from a blog post by [[http://metajack.im/2008/12/30/gtd-capture-with-emacs-orgmode/][Jack Moffitt]].
