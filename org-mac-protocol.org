@@ -64,7 +64,7 @@
     - /(Optional)/ Byte compile =org-mac-protocol.el=
 
 [fn:1] The AppleScripts have been saved as text so as to track
-changes with git; they must be compiled to run.
+changes with git; they must be compiled in order to run.
 
 *** Copy files to relevant directories 
       
@@ -241,4 +241,5 @@ change sheet manually.
 ** Acknowledgements
    
    The pop up remember buffer is developed from a blog post by [[http://metajack.im/2008/12/30/gtd-capture-with-emacs-orgmode/][Jack Moffitt]].
-   Alexander Poslavsky for Address Book support.
+
+   Alexander Poslavsky wrote Address Book support.
