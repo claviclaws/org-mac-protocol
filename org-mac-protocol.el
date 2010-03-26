@@ -3,7 +3,7 @@
 
 ;; Copyright (C) 2009, 2010 Christopher Suckling
 
-;; Author: Christopher Suckling <suckling at gmail dot com>
+;; Authors: Christopher Suckling <suckling at gmail dot com>
 
 ;; This file is Free Software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -182,6 +182,28 @@ manually"
 	 "playpause\n"
       "end tell"
 	 ))))
+
+
+;; Address Book
+;; Support based on code by Alexander Poslavsky
+
+(org-add-link-type "address" 'org-mac-addressbook-open)
+
+(defun org-mac-addressbook-open (uri)
+  "Applescript to open correct address-book entry"
+  (do-applescript
+   (concat
+    "set theID to \"" uri "\"\n"
+
+    "tell application \"System Events\"\n"
+        "activate\n"
+        "try\n"
+            "open location \"addressbook\:\/\/\" \& theID\n"
+            "on error\n"
+            "display dialog \"no matching contact found\"\n"
+        "end try\n"
+    "end tell"
+    )))
 
 
 ;;; Variables and advice for managing *remember* frames

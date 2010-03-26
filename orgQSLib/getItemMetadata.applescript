@@ -3,7 +3,8 @@ getItemMetadata.scpt --- get data to be passed to org-protocol from front applic
 
 Copyright (C) 2009, 2010 Christopher Suckling
 
-Author: Christopher Suckling <suckling at gmail dot com>
+Author:  Christopher Suckling <suckling at gmail dot com>
+		Alexander Poslavsky <alexander.poslavsky at gmail.com>
 
 This file is Free Software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -69,16 +70,20 @@ on getItemMetadata(theProtocol, theApp)
 								if (theApp as string) = "Mail" then
 									linkMail(theProtocol, theApp)
 								else
-									if (theApp as string) = "iTunes" then
-										linkITunes(theProtocol, theApp)
+									if (theApp as string) = "Address Book" then
+										linkAddressBook(theProtocol, theApp)
 									else
-										if (theApp as string) = "Terminal" then
-											linkTerminal(theProtocol, theApp)
+										if (theApp as string) = "iTunes" then
+											linkITunes(theProtocol, theApp)
 										else
-											if (theApp as string) = "Finder" then
-												linkFinder(theProtocol, theApp)
+											if (theApp as string) = "Terminal" then
+												linkTerminal(theProtocol, theApp)
 											else
-												linkApplication(theProtocol, theApp)
+												if (theApp as string) = "Finder" then
+													linkFinder(theProtocol, theApp)
+												else
+													linkApplication(theProtocol, theApp)
+												end if
 											end if
 										end if
 									end if
@@ -340,6 +345,32 @@ on linkMail(theProtocol, theApp)
 	
 	set theLink to theProtocol & escScheme & escID & "/" & escSubject & "/" & escShortSubject & "/" & escContent & ":" & escApp
 end linkMail
+
+on linkAddressBook(theProtocol, theApp)
+	(*
+By Alexander Poslavsky
+*)
+	tell application "Address Book"
+		set theScheme to "address:"
+		set AllContacts to selection
+		if number of items in AllContacts = 1 then
+			set one_contact to item 1 of AllContacts
+			set theID to id of one_contact
+			set theName to name of one_contact
+		else
+			tell application "System Events"
+				activate
+				display dialog "Error: Choose one contact"
+			end tell
+		end if
+	end tell
+	
+	set escID to encodeURIComponent(theID)
+	set escName to encodeURIComponent(theName)
+	set escScheme to encodeURIComponent(theScheme)
+	set theLink to theProtocol & escScheme & escID & "/" & escName & ":" & escApp
+end linkAddressBook
+
 
 on linkITunes(theProtocol, theApp)
 	tell application "iTunes"

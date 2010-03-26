@@ -16,6 +16,7 @@
 
   + Safari
   + Mail
+  + Address Book
   + [[http://skim-app.sourceforge.net/][Skim]]
   + [[http://bibdesk.sourceforge.net/][BibDesk]]
   + Pages
@@ -33,7 +34,7 @@
   =org-link= creates an org-mode link and adds it to =*Org Links*= and
   the kill-ring.
 
-  =org-link-tabs= creats org-mode links to all tabs in the front
+  =org-link-tabs= creates org-mode links to all tabs in the front
   Safari window and adds them to =*Org Links*= and the kill-ring.
 
   =org-remember= pops up a small =*Remember*= frame with links and,
@@ -62,7 +63,7 @@
 
     - /(Optional)/ Byte compile =org-mac-protocol.el=
 
-[fn:1] The AppleScripts have been saved as text in order to track
+[fn:1] The AppleScripts have been saved as text so as to track
 changes with git; they must be compiled to run.
 
 *** Copy files to relevant directories 
@@ -70,8 +71,8 @@ changes with git; they must be compiled to run.
       - =org-mac-protocol.el= should be copied to your Emacs
         load-path
 
-      - The compiled AppleScripts and the folder =/orgQSLib= should
-        be copied to =~/Library/Scripts=
+      - The compiled AppleScripts, =.scpt=, and the folder =/orgQSLib=
+        should be copied to =~/Library/Scripts=
 
 	The folder structure should be:
 
@@ -103,6 +104,14 @@ changes with git; they must be compiled to run.
 
 **** Create =*Remember*= templates
 
+#+BEGIN_SRC emacs-lisp
+(setq org-remember-templates
+      '((template 1)
+        (template 2)
+	...
+	(template n)))
+#+END_SRC
+     
      Two separate =*Remember*= templates are required, one for
      =org-remember= and one for =org-note=. Two examples:
     
@@ -112,7 +121,7 @@ changes with git; they must be compiled to run.
      
      These templates can be fairly flexible. The only essential items
      are =?y= and =?z= respectively (the template selection
-     characters), and, for =org-remember=, =%c= (the link to the
+     characters) and, for =org-remember=, =%c= (the org-link to the
      document), and =%:initial= (the selection within the document).
 
      In addition to the usual [[http://orgmode.org/manual/Remember-templates.html#Remember-templates][org-remember]] `%'-escapes, the following
@@ -134,11 +143,12 @@ changes with git; they must be compiled to run.
 **** Eval .emacs
 *** Edit orgQSLib/getEmacsClient.scpt
     
-    - Set =theEmacsClient= to point to emacsclient for your flavour of Emacs.
+    Set =theEmacsClient= to point to emacsclient for your flavour of
+    Emacs.
       
-      The default setting should work with Emacs.app compiled from
-      bazaar and installed in =/Applications=. Aquamacs users will
-      have to edit this variable.
+    The default setting should work with Emacs.app compiled from
+    bazaar and installed in =/Applications=. Aquamacs users will have
+    to edit this variable.
 
 ** Usage
    There are four scripts that can be invoked; =org-link=,
@@ -148,18 +158,19 @@ changes with git; they must be compiled to run.
 
 *** Currently supported applications
 
-    |          | org-link           | org-link-tabs | org-remember                                         |
-    |----------+--------------------+---------------+------------------------------------------------------|
-    | Safari   | Link: URL          | Link: URLs    | Content: current selection                           |
-    | Mail     | Link: message      |               | Content: entire message                              |
-    | Skim     | Link: page         |               | Content: current selection                           |
-    | BibDesk  | Link: entry        |               | Content: Harvard style citation                      |
-    | Pages    | Link: page [fn:2]  |               | Content: current selection                           |
-    | Numbers  | Link: range [fn:3] |               | Content: current selection                           |
-    | Keynote  | Link: slide        |               | Content: slide title and body text                   |
-    | iTunes   | Link: track        |               | Content: Title, Album, Composer, and Artist of track |
-    | Finder   | Link: file         |               | Content: no                                          |
-    | Terminal | Link: Terminal.app |               | Content: current window contents                     |
+    |              | org-link           | org-link-tabs | org-remember                                         |
+    |--------------+--------------------+---------------+------------------------------------------------------|
+    | Safari       | Link: URL          | Link: URLs    | Content: current selection                           |
+    | Mail         | Link: message      |               | Content: entire message                              |
+    | Address Book | Link: person       |               | Content: no                                          |
+    | Skim         | Link: page         |               | Content: current selection                           |
+    | BibDesk      | Link: entry        |               | Content: Harvard style citation                      |
+    | Pages        | Link: page [fn:2]  |               | Content: current selection                           |
+    | Numbers      | Link: range [fn:3] |               | Content: current selection                           |
+    | Keynote      | Link: slide        |               | Content: slide title and body text                   |
+    | iTunes       | Link: track        |               | Content: Title, Album, Composer, and Artist of track |
+    | Finder       | Link: file         |               | Content: no                                          |
+    | Terminal     | Link: Terminal.app |               | Content: current window contents                     |
 
 
     - Unsupported applications that are AppleScript aware will attempt
@@ -179,19 +190,19 @@ change sheet manually.
     Creates an org-mode link from the front document and passes it to
     emacsclient, adding it to =*Org Links*= and the kill-ring.
 
-    - Run =org-link=
+    - Call =org-link= from the required document
 
 *** org-link-tabs
     Creates org-mode links from all tabs in the front Safari window and
     passes them to emacsclient, adding them to =*Org Links*= and the kill-ring.
 
-    - Run =org-link-tabs=
+    - Call =org-link-tabs= from anywhere
 
 *** org-note
     Creates a note in an org-mode buffer. Does not link to the front
     document.
 
-    - Run =org-note=
+    - Call =org-note=
     - Enter note in pop-up =*Remember*= buffer
     - File note to return to previous application
       
@@ -200,7 +211,7 @@ change sheet manually.
     front document and, where possible, uses selection in front
     document as initial content of the =*Remember*= buffer.
 
-    - Run =org-remember=
+    - Call =org-remember= from the required document
     - Enter note in pop-up =*Remember*= buffer
     - File note to return to previous application
        
@@ -213,14 +224,16 @@ change sheet manually.
 
     : org-protocol:/sub-protocol:/key/URI/description/short description/content:application name
 
-    =org-protocol:/sub-protocol:/key/= is formed by the variable
-    =theProtocol=
+    =org-protocol:/sub-protocol:/key/= is held by the variable
+    =theProtocol= and set by =org-link=, =org-link-tabs=, =org-note=,
+    or =org-remember=
 
-    =application name= is formed by the variable =theApp=
+    =application name= is held by the variable =theApp= and set by
+    =org-link=, =org-link-tabs=, or =org-remember=
 
-    =URI= is formed by =getItemMetadata=
+    =URI= is created by =getItemMetadata=
 
-    =description= of the =URI= is formed by =getItemMetadata= and =theApp=
+    =description= of the =URI= is created by =getItemMetadata=
 
     =short description= is a truncated version of =description=
     removing the =theApp= from the description
@@ -228,3 +241,4 @@ change sheet manually.
 ** Acknowledgements
    
    The pop up remember buffer is developed from a blog post by [[http://metajack.im/2008/12/30/gtd-capture-with-emacs-orgmode/][Jack Moffitt]].
+   Alexander Poslavsky for Address Book support.
