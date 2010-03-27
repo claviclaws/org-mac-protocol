@@ -55,23 +55,12 @@
    - [[https://gna.org/p/remember-el][Remember]]
 
 ** Installation and configuration
-*** Compile scripts
-
-    - Open all =.applescript= files (4 in the repository home and 2 in
-      =/orgQSLib=) in [[file://Applications/Utilities/AppleScript%20Editor.app/][AppleScript Editor]] then =File - Save As... -
-      File Format: Script= [fn:1]
-
-    - /(Optional)/ Byte compile =org-mac-protocol.el=
-
-[fn:1] The AppleScripts have been saved as text so as to track
-changes with git; they must be compiled in order to run.
-
 *** Copy files to relevant directories 
       
       - =org-mac-protocol.el= should be copied to your Emacs
         load-path
 
-      - The compiled AppleScripts, =.scpt=, and the folder =/orgQSLib=
+      - The compiled AppleScripts[fn:1], =.scpt=, and the folder =/orgQSLib=
         should be copied to =~/Library/Scripts=
 
 	The folder structure should be:
@@ -85,7 +74,10 @@ changes with git; they must be compiled in order to run.
 		           getEmacsClient.scpt
 			   getItemMetadata.scpt
 #+END_EXAMPLE
-
+[fn:1] The repository contains two copies of all the
+AppleScripts. Those with the suffix =.scpt= are compiled and ready for
+installation, whilst those with the suffix =.applescript= are text
+files for editing.
 
 *** Edit your .emacs
 **** Require org-mac-protocol.el
