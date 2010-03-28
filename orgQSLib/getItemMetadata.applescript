@@ -52,37 +52,45 @@ on getItemMetadata(theProtocol, theApp)
 		if (theApp as string) = "Safari-Tabs" then
 			linkSafariTabs(theProtocol, theApp)
 		else
-			if (theApp as string) = "Skim" then
-				linkSkim(theProtocol, theApp)
+			if (theApp as string) = "firefox-bin" then
+				linkFirefox(theProtocol, theApp)
 			else
-				if (theApp as string) = "BibDesk" then
-					linkBibDesk(theProtocol, theApp)
+				if (theApp as string) = "Google Chrome" then
+					linkChrome(theProtocol, theApp)
 				else
-					if (theApp as string) = "Pages" then
-						linkPages(theProtocol, theApp)
+					if (theApp as string) = "Skim" then
+						linkSkim(theProtocol, theApp)
 					else
-						if (theApp as string) = "Numbers" then
-							linkNumbers(theProtocol, theApp)
+						if (theApp as string) = "BibDesk" then
+							linkBibDesk(theProtocol, theApp)
 						else
-							if (theApp as string) = "Keynote" then
-								linkKeynote(theProtocol, theApp)
+							if (theApp as string) = "Pages" then
+								linkPages(theProtocol, theApp)
 							else
-								if (theApp as string) = "Mail" then
-									linkMail(theProtocol, theApp)
+								if (theApp as string) = "Numbers" then
+									linkNumbers(theProtocol, theApp)
 								else
-									if (theApp as string) = "Address Book" then
-										linkAddressBook(theProtocol, theApp)
+									if (theApp as string) = "Keynote" then
+										linkKeynote(theProtocol, theApp)
 									else
-										if (theApp as string) = "iTunes" then
-											linkITunes(theProtocol, theApp)
+										if (theApp as string) = "Mail" then
+											linkMail(theProtocol, theApp)
 										else
-											if (theApp as string) = "Terminal" then
-												linkTerminal(theProtocol, theApp)
+											if (theApp as string) = "Address Book" then
+												linkAddressBook(theProtocol, theApp)
 											else
-												if (theApp as string) = "Finder" then
-													linkFinder(theProtocol, theApp)
+												if (theApp as string) = "iTunes" then
+													linkITunes(theProtocol, theApp)
 												else
-													linkApplication(theProtocol, theApp)
+													if (theApp as string) = "Terminal" then
+														linkTerminal(theProtocol, theApp)
+													else
+														if (theApp as string) = "Finder" then
+															linkFinder(theProtocol, theApp)
+														else
+															linkApplication(theProtocol, theApp)
+														end if
+													end if
 												end if
 											end if
 										end if
@@ -157,6 +165,54 @@ on linkSafariTabs(theProtocol, theApp)
 	
 	set theLink to theProtocol & theLinkList
 end linkSafariTabs
+
+on linkFirefox(theProtocol, theApp)
+	tell application "Firefox"
+		activate
+		set oldClipboard to the clipboard
+		tell application "System Events"
+			keystroke "l" using command down
+			keystroke "c" using command down
+		end tell
+		delay 0.15
+		set theURL to the clipboard
+		set the clipboard to oldClipboard
+		set theShortTitle to (get name of window 1)
+		set theTitle to theShortTitle & ":Firefox"
+		set theContent to the clipboard
+	end tell
+	
+	set escURL to encodeURIComponent(theURL)
+	set escShortTitle to encodeURIComponent(theShortTitle)
+	set escTitle to encodeURIComponent(theTitle)
+	set escContent to encodeURIComponent(theContent)
+	
+	set theLink to theProtocol & escURL & "/" & escTitle & "/" & escShortTitle & "/" & escContent & ":Firefox"
+end linkFirefox
+
+on linkChrome(theProtocol, theApp)
+	set oldClipboard to the clipboard
+	tell application "Google Chrome"
+		tell application "System Events"
+			keystroke "l" using command down
+			keystroke "c" using command down
+		end tell
+		delay 0.15
+		set theURL to the clipboard
+		set the clipboard to oldClipboard
+		set theShortTitle to (get name of window 1)
+		set theTitle to theShortTitle & ":" & theApp
+		set theContent to the clipboard
+	end tell
+	
+	set escURL to encodeURIComponent(theURL)
+	set escShortTitle to encodeURIComponent(theShortTitle)
+	set escTitle to encodeURIComponent(theTitle)
+	set escContent to encodeURIComponent(theContent)
+	
+	set theLink to theProtocol & escURL & "/" & escTitle & "/" & escShortTitle & "/" & escContent & ":" & escApp
+end linkChrome
+
 
 on linkSkim(theProtocol, theApp)
 	tell application "Skim"

@@ -150,19 +150,21 @@ files for editing.
 
 *** Currently supported applications
 
-    |              | org-link           | org-link-tabs | org-remember                                         |
-    |--------------+--------------------+---------------+------------------------------------------------------|
-    | Safari       | Link: URL          | Link: URLs    | Content: current selection                           |
-    | Mail         | Link: message      |               | Content: entire message                              |
-    | Address Book | Link: person       |               | Content: no                                          |
-    | Skim         | Link: page         |               | Content: current selection                           |
-    | BibDesk      | Link: entry        |               | Content: Harvard style citation                      |
-    | Pages        | Link: page [fn:2]  |               | Content: current selection                           |
-    | Numbers      | Link: range [fn:3] |               | Content: current selection                           |
-    | Keynote      | Link: slide        |               | Content: slide title and body text                   |
-    | iTunes       | Link: track        |               | Content: Title, Album, Composer, and Artist of track |
-    | Finder       | Link: file         |               | Content: no                                          |
-    | Terminal     | Link: Terminal.app |               | Content: current window contents                     |
+    |               | org-link           | org-link-tabs | org-remember                                         |
+    |---------------+--------------------+---------------+------------------------------------------------------|
+    | Safari        | Link: URL          | Link: URLs    | Content: current selection                           |
+    | Firefox       | Link: URL          |               | Content: current *clipboard* [fn:2]                  |
+    | Google Chrome | Link: URL          |               | Content: current *clipboard* [fn:2]                  |
+    | Mail          | Link: message      |               | Content: entire message                              |
+    | Address Book  | Link: person       |               | Content: no                                          |
+    | Skim          | Link: page         |               | Content: current selection                           |
+    | BibDesk       | Link: entry        |               | Content: Harvard style citation                      |
+    | Pages         | Link: page [fn:3]  |               | Content: current selection                           |
+    | Numbers       | Link: range [fn:4] |               | Content: current selection                           |
+    | Keynote       | Link: slide        |               | Content: slide title and body text                   |
+    | iTunes        | Link: track        |               | Content: Title, Album, Composer, and Artist of track |
+    | Finder        | Link: file         |               | Content: no                                          |
+    | Terminal      | Link: Terminal.app |               | Content: current window contents                     |
 
 
     - Unsupported applications that are AppleScript aware will attempt
@@ -172,10 +174,14 @@ files for editing.
     - Preview.app is /not/ AppleScript aware and Firefox has such
       limited AppleScript support as to be useless.
 
-[fn:2] Pages actually links to a character offset from the start of
+[fn:4] Firefox and Google Chrome have very limited AppleScript
+support. Consequently is is necessary to *copy* any content you want
+remembering to the clipboard.
+
+[fn:3] Pages actually links to a character offset from the start of
 the document. If the document is edited, then the link may degrade.
 
-[fn:3] Numbers opens and selects the linked range, but it may be necessary to
+[fn:4] Numbers opens and selects the linked range, but it may be necessary to
 change sheet manually.      
       
 *** org-link
@@ -235,3 +241,5 @@ change sheet manually.
    The pop up remember buffer is developed from a blog post by [[http://metajack.im/2008/12/30/gtd-capture-with-emacs-orgmode/][Jack Moffitt]].
 
    Alexander Poslavsky wrote Address Book support.
+
+   Antony Lander for Firefox Support.
