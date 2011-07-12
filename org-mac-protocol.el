@@ -331,6 +331,7 @@ link property"
 	 (region (or (cadddr parts) ""))
 	 (orglink (org-make-link-string
 		   url (if (string-match "[^[:space:]]" title) title url)))
+	 (org-capture-link-is-already-stored t)
 	 remember-annotation-functions)
     
     (setq org-mac-protocol-app app)
@@ -362,6 +363,8 @@ link property"
 			  :description title
 			  :shortdesc shorttitle
 			  :initial region)
+    (message "protocol: %s" (plist-get org-store-link-plist :shortdesc))
+    
     (if (boundp 'org-capture-templates)
 	(org-capture nil template)
       (org-remember nil (string-to-char template))))
