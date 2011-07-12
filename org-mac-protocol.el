@@ -274,26 +274,47 @@ the remember frame"
 (add-hook 'org-capture-mode-hook
 	  '(lambda ()
 	     (when (equal "*mac-remember*" (frame-parameter nil 'name))
-	       (delete-other-windows))))
+	       (delete-other-windows))))  
 
 (add-hook 'org-capture-after-finalize-hook
+	  '(lambda ()	     
+	     (unless (boundp 'org-refile-for-capture)
+	       (when (equal "*mac-remember*" (frame-parameter nil 'name))
+		 (mapc
+		  (lambda (x)
+		    (when (not (equal (frame-parameter x 'name) "*mac-remember*"))
+		      (make-frame-visible x)))
+		  (frame-list))
+		 (mapc
+		  (lambda (x)
+		    (when (equal (frame-parameter x 'name) "*mac-remember*")
+		      (delete-frame x)))
+		  (frame-list))
+		 (do-applescript
+		  (concat
+		   "tell application \"" org-mac-protocol-app "\"\n"
+		   "activate\n"
+		   "end tell"))))))
+
+(add-hook 'org-after-refile-insert-hook
 	  '(lambda ()
-	     (when (equal "*mac-remember*" (frame-parameter nil 'name))
-	       (mapc
-		(lambda (x)
-		  (when (not (equal (frame-parameter x 'name) "*mac-remember*"))
-		    (make-frame-visible x)))
-		(frame-list))
-	       (mapc
-		(lambda (x)
-		  (when (equal (frame-parameter x 'name) "*mac-remember*")
-		    (delete-frame x)))
-		(frame-list))
-	       (do-applescript
-		(concat
-		 "tell application \"" org-mac-protocol-app "\"\n"
-		 "activate\n"
-		 "end tell")))))
+	     (when (boundp 'org-refile-for-capture)
+	       (when (equal "*mac-remember*" (frame-parameter nil 'name))
+		 (mapc
+		  (lambda (x)
+		    (when (not (equal (frame-parameter x 'name) "*mac-remember*"))
+		      (make-frame-visible x)))
+		  (frame-list))
+		 (mapc
+		  (lambda (x)
+		    (when (equal (frame-parameter x 'name) "*mac-remember*")
+		      (delete-frame x)))
+		  (frame-list))
+		 (do-applescript
+		  (concat
+		   "tell application \"" org-mac-protocol-app "\"\n"
+		   "activate\n"
+		   "end tell"))))))
 
 ;;; Define org-protocol protocols
 
