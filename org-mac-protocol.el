@@ -84,7 +84,7 @@
       "tell application \"Skim\"\n"
          "activate\n"
 	 "set theDoc to \"" document "\"\n"
-	 "set thePage to " page "\n"
+		     "set thePage to " page "\n"
 	 "open theDoc\n"
 	 "go document 1 to page thePage of document 1\n"
       "end tell"))))
@@ -208,6 +208,8 @@ manually"
 
 ;;; Variables and advice for managing *remember* frames
 
+;; updated for org-capture hooks
+
 (defvar width-of-display (x-display-pixel-width)
   "For some reason, (x-display-pixel-width) returns corrupted
 values when called during (org-mac-protocol-remember); this
@@ -269,6 +271,29 @@ the remember frame"
   (when (equal "*mac-remember*" (frame-parameter nil 'name))
     (delete-other-windows)))
 
+(add-hook 'org-capture-mode-hook
+	  '(lambda ()
+	     (when (equal "*mac-remember*" (frame-parameter nil 'name))
+	       (delete-other-windows))))
+
+(add-hook 'org-capture-after-finalize-hook
+	  '(lambda ()
+	     (when (equal "*mac-remember*" (frame-parameter nil 'name))
+	       (mapc
+		(lambda (x)
+		  (when (not (equal (frame-parameter x 'name) "*mac-remember*"))
+		    (make-frame-visible x)))
+		(frame-list))
+	       (mapc
+		(lambda (x)
+		  (when (equal (frame-parameter x 'name) "*mac-remember*")
+		    (delete-frame x)))
+		(frame-list))
+	       (do-applescript
+		(concat
+		 "tell application \"" org-mac-protocol-app "\"\n"
+		 "activate\n"
+		 "end tell")))))
 
 ;;; Define org-protocol protocols
 
@@ -337,8 +362,10 @@ link property"
 			  :description title
 			  :shortdesc shorttitle
 			  :initial region)
-    (org-remember nil (string-to-char template)))
-  nil)
+    (if (boundp 'org-capture-templates)
+	(org-capture nil template)
+      (org-remember nil (string-to-char template))))
+  nil) 
 
 (defun org-mac-safari-tabs (data)
   "Process an org-protocol://safari-tabs:// scheme URL.
