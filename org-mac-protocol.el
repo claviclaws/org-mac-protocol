@@ -40,6 +40,7 @@
 ;; Portions of this code are developed from a blog post by Jack Moffitt:
 ;; http://metajack.im/2008/12/30/gtd-capture-with-emacs-orgmode/
 
+(require 'cl)
 (require 'org-protocol)
 (require 'org-bibtex)
 
